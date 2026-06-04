@@ -6,4 +6,7 @@ public class BeanDefinitionCreationException extends RuntimeException {
         super(message);
     }
 
+    public BeanDefinitionCreationException(String message, Throwable cause) {
+        super(message, cause);
+    }
 }

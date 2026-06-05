@@ -64,9 +64,11 @@ public class PipelineWorker {
         if (clazz.isEnum() ||
                 clazz.isInterface() ||
                 clazz.isAnnotation() ||
-                Modifier.isAbstract(clazz.getModifiers()) ||
-                clazz.getDeclaredConstructors().length == 0) {
+                Modifier.isAbstract(clazz.getModifiers())) {
             throw new BeanDefinitionCreationException("Pipeline phase 1 failed: invariant violated. Invalid annotated type " + clazz.getName());
+        }
+        if (clazz.getDeclaredConstructors().length == 0) {
+            throw new BeanDefinitionCreationException("Pipeline phase 1 failed: constructor is absent in class " + clazz.getName());
         }
         return clazz;
     }

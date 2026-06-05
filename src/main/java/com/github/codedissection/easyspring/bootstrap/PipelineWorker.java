@@ -1,9 +1,9 @@
-package bootstrap;
+package com.github.codedissection.easyspring.bootstrap;
 
-import bootstrap.dto.ClassPropertiesContainer;
-import definition.BeanDefinition;
-import definition.annotation.root.EasySpringAnnotation;
-import definition.exception.BeanDefinitionCreationException;
+import com.github.codedissection.easyspring.bootstrap.dto.ClassPropertiesContainer;
+import com.github.codedissection.easyspring.definition.BeanDefinition;
+import com.github.codedissection.easyspring.definition.annotation.root.EasySpringAnnotation;
+import com.github.codedissection.easyspring.definition.exception.BeanDefinitionCreationException;
 import io.github.classgraph.ClassGraph;
 import io.github.classgraph.ClassInfo;
 import io.github.classgraph.ScanResult;
@@ -24,7 +24,8 @@ public class PipelineWorker {
                 .enableAnnotationInfo();
 
         try (ScanResult result = scanner.scan()) {
-            var classes = result.getClassesWithAnnotation(EasySpringAnnotation.class.getName());
+            var classes = result.getClassesWithAnnotation(EasySpringAnnotation.class.getName())
+                    .filter(classInfo -> classInfo.getPackageName().startsWith(packageToScan));
             List<ClassPropertiesContainer> classPropertiesStorage = new ArrayList<>();
             for (ClassInfo info : classes) {
                 var sourceClass = validateClass(info.loadClass());

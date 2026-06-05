@@ -1,6 +1,6 @@
-package definition.annotation;
+package com.github.codedissection.easyspring.definition.annotation;
 
-import definition.annotation.root.EasySpringAnnotation;
+import com.github.codedissection.easyspring.definition.annotation.root.EasySpringAnnotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

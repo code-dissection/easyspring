@@ -1,4 +1,4 @@
-package definition.enums;
+package com.github.codedissection.easyspring.definition.enums;
 
 /**
  * Reuse strategy.

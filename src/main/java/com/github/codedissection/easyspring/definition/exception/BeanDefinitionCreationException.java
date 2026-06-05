@@ -1,4 +1,4 @@
-package definition.exception;
+package com.github.codedissection.easyspring.definition.exception;
 
 public class BeanDefinitionCreationException extends RuntimeException {
 

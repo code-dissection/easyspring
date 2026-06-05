@@ -1,7 +1,7 @@
-package bootstrap;
+package com.github.codedissection.easyspring.bootstrap;
 
-import bootstrap.dto.ClassPropertiesContainer;
-import definition.BeanDefinition;
+import com.github.codedissection.easyspring.bootstrap.dto.ClassPropertiesContainer;
+import com.github.codedissection.easyspring.definition.BeanDefinition;
 
 import java.util.List;
 import java.util.Map;

@@ -1,6 +1,6 @@
-package bootstrap.dto;
+package com.github.codedissection.easyspring.bootstrap.dto;
 
-import definition.exception.BeanDefinitionCreationException;
+import com.github.codedissection.easyspring.definition.exception.BeanDefinitionCreationException;
 
 import java.util.List;
 

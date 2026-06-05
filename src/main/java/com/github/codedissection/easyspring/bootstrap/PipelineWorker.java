@@ -25,7 +25,8 @@ public class PipelineWorker {
 
         try (ScanResult result = scanner.scan()) {
             var classes = result.getClassesWithAnnotation(EasySpringAnnotation.class.getName())
-                    .filter(classInfo -> classInfo.getPackageName().startsWith(packageToScan));
+                    .filter(classInfo -> classInfo.getPackageName().startsWith(packageToScan) ||
+                            classInfo.getPackageName().startsWith(packageToScan + "."));
             List<ClassPropertiesContainer> classPropertiesStorage = new ArrayList<>();
             for (ClassInfo info : classes) {
                 var sourceClass = validateClass(info.loadClass());

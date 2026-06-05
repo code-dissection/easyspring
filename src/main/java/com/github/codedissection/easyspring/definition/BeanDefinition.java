@@ -1,8 +1,8 @@
-package definition;
+package com.github.codedissection.easyspring.definition;
 
-import definition.enums.BeanInstantiationStrategy;
-import definition.enums.BeanReuseStrategy;
-import definition.exception.BeanDefinitionCreationException;
+import com.github.codedissection.easyspring.definition.exception.BeanDefinitionCreationException;
+import com.github.codedissection.easyspring.definition.enums.BeanInstantiationStrategy;
+import com.github.codedissection.easyspring.definition.enums.BeanReuseStrategy;
 
 import java.util.List;
 import java.util.Objects;

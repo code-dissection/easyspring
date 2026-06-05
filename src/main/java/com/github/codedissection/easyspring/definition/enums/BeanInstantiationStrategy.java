@@ -1,4 +1,4 @@
-package definition.enums;
+package com.github.codedissection.easyspring.definition.enums;
 
 /**
  * Instantiation strategy (or instantiation timing strategy).

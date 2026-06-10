@@ -1,15 +1,15 @@
 package com.github.codedissection.easyspring.bootstrap.dto;
 
-import com.github.codedissection.easyspring.definition.exception.BeanDefinitionCreationException;
+import com.github.codedissection.easyspring.definition.exception.BeanDefinitionCreateException;
 
 import java.util.List;
 
-public class ClassPropertiesContainer {
+public class MetadataContainer {
     private final String name;
     private final Class<?> sourceClass;
     private final List<Class<?>> dependencies;
 
-    ClassPropertiesContainer(Builder builder) {
+    MetadataContainer(Builder builder) {
         this.name = builder.name;
         this.sourceClass = builder.sourceClass;
         this.dependencies = builder.dependencies;
@@ -34,7 +34,7 @@ public class ClassPropertiesContainer {
 
         public Builder withName(String name) {
             if (name == null) {
-                throw new BeanDefinitionCreationException("Can't create ClassPropertiesContainer: name can't be null...");
+                throw new BeanDefinitionCreateException("Can't create ClassMetadataContainer: name can't be null...");
             }
             this.name = name;
             return this;
@@ -42,7 +42,7 @@ public class ClassPropertiesContainer {
 
         public Builder withSourceClass(Class<?> sourceClass) {
             if (sourceClass == null) {
-                throw new BeanDefinitionCreationException("Can't create ClassPropertiesContainer: sourceClass can't be null...");
+                throw new BeanDefinitionCreateException("Can't create ClassMetadataContainer: sourceClass can't be null...");
             }
             this.sourceClass = sourceClass;
             return this;
@@ -50,25 +50,25 @@ public class ClassPropertiesContainer {
 
         public Builder withDependencies(List<Class<?>> dependencies) {
             if (dependencies == null) {
-                throw new BeanDefinitionCreationException("Can't create ClassPropertiesContainer: dependencies can't be null...");
+                throw new BeanDefinitionCreateException("Can't create ClassMetadataContainer: dependencies can't be null...");
             }
             this.dependencies = List.copyOf(dependencies);
             return this;
         }
 
-        public ClassPropertiesContainer build() {
+        public MetadataContainer build() {
             if (name == null) {
-                throw new BeanDefinitionCreationException("Can't create ClassPropertiesContainer: name can't be null...");
+                throw new BeanDefinitionCreateException("Can't create ClassMetadataContainer: name can't be null...");
             }
 
             if (sourceClass == null) {
-                throw new BeanDefinitionCreationException("Can't create ClassPropertiesContainer: sourceClass can't be null...");
+                throw new BeanDefinitionCreateException("Can't create ClassMetadataContainer: sourceClass can't be null...");
             }
 
             if (dependencies == null) {
                 this.dependencies = List.of();
             }
-            return new ClassPropertiesContainer(this);
+            return new MetadataContainer(this);
         }
     }
 }

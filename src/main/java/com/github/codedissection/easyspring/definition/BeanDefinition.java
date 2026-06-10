@@ -1,6 +1,6 @@
 package com.github.codedissection.easyspring.definition;
 
-import com.github.codedissection.easyspring.definition.exception.BeanDefinitionCreationException;
+import com.github.codedissection.easyspring.definition.exception.BeanDefinitionCreateException;
 import com.github.codedissection.easyspring.definition.enums.BeanInstantiationStrategy;
 import com.github.codedissection.easyspring.definition.enums.BeanReuseStrategy;
 
@@ -71,12 +71,12 @@ public final class BeanDefinition {
 
         public Builder(Class<?> sourceClass, List<Class<?>> dependencies) {
             if (sourceClass == null) {
-                throw new BeanDefinitionCreationException("Can't create BeanDefinition: sourceClass can't be null...");
+                throw new BeanDefinitionCreateException("Can't create BeanDefinition: sourceClass can't be null...");
             }
             this.sourceClass = sourceClass;
 
             if (dependencies == null) {
-                throw new BeanDefinitionCreationException("Can't create BeanDefinition: dependencies can't be null...");
+                throw new BeanDefinitionCreateException("Can't create BeanDefinition: dependencies can't be null...");
             }
             this.dependencies = List.copyOf(dependencies);
         }

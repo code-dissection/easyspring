@@ -1,6 +1,6 @@
 package com.github.codedissection.easyspring.bootstrap;
 
-import com.github.codedissection.easyspring.bootstrap.dto.MetadataContainer;
+import com.github.codedissection.easyspring.bootstrap.dto.TypeMetadataContainer;
 import com.github.codedissection.easyspring.definition.BeanDefinition;
 import com.github.codedissection.easyspring.definition.annotation.root.EasySpringAnnotation;
 import com.github.codedissection.easyspring.definition.exception.BeanDefinitionCreateException;
@@ -16,8 +16,8 @@ import java.util.stream.Stream;
 
 public class PipelineWorker {
 
-    public List<MetadataContainer> getMetadataConfiguration(String packageToScan) {
-        List<MetadataContainer> classMetadataStorage = new ArrayList<>();
+    public List<TypeMetadataContainer> getMetadataConfiguration(String packageToScan) {
+        List<TypeMetadataContainer> classMetadataStorage = new ArrayList<>();
         ClassGraph scanner = new ClassGraph()
                 .acceptPackages(packageToScan)
                 .enableClassInfo()
@@ -30,7 +30,7 @@ public class PipelineWorker {
                 var className = info.getName();
                 var constructor = getTheOnlyConstructor(sourceClass);
                 var dependencies = getBeanDependencies(result, constructor);
-                var container = new MetadataContainer.Builder()
+                var container = new TypeMetadataContainer.Builder()
                         .withName(className)
                         .withSourceClass(sourceClass)
                         .withDependencies(dependencies)
@@ -45,9 +45,45 @@ public class PipelineWorker {
         }
     }
 
-    public Map<String, BeanDefinition> createDefinitions(List<MetadataContainer> loadClasses) {
+    public Map<Class<?>, List<Class<?>>> getProjectHierarchy(List<TypeMetadataContainer> projectTypes) {
+        Map<Class<?>, List<Class<?>>> projectHierarchy = new HashMap<>();
+        for (TypeMetadataContainer container : projectTypes) {
+            Class<?> currentNode = container.getSourceClass();
+            var parents = invertDFS(currentNode, new HashSet<>());
+            for (Class<?> node : parents) {
+                if (projectHierarchy.containsKey(node)) {
+                    projectHierarchy.get(node).add(currentNode);
+                } else {
+                    var list = new ArrayList<Class<?>>();
+                    list.add(currentNode);
+                    projectHierarchy.put(node, list);
+                }
+            }
+        }
+        return projectHierarchy;
+    }
+
+    private Set<Class<?>> invertDFS(Class<?> currentType, Set<Class<?>> parents) {
+        if (currentType == null || currentType == Object.class) {
+            return parents;
+        }
+        Class<?> superClass = currentType.getSuperclass();
+        List<Class<?>> superInterfaces = Arrays.asList(currentType.getInterfaces());
+        var ancestors = new ArrayList<Class<?>>();
+        if (superClass != null && superClass != Object.class) {
+            ancestors.add(superClass);
+        }
+        ancestors.addAll(superInterfaces);
+        for (Class<?> clazz : ancestors) {
+            invertDFS(clazz, parents);
+        }
+        parents.add(currentType);
+        return parents;
+    }
+
+    public Map<String, BeanDefinition> createBeanDefinitions(List<TypeMetadataContainer> loadClasses) {
         Map<String, BeanDefinition> definitionStorage = new ConcurrentHashMap<>();
-        for (MetadataContainer myClass : loadClasses) {
+        for (TypeMetadataContainer myClass : loadClasses) {
             var name = myClass.getName();
             var sourceClass = myClass.getSourceClass();
             var dependencies = myClass.getDependencies();

@@ -4,12 +4,12 @@ import com.github.codedissection.easyspring.definition.exception.BeanDefinitionC
 
 import java.util.List;
 
-public class MetadataContainer {
+public class TypeMetadataContainer {
     private final String name;
     private final Class<?> sourceClass;
     private final List<Class<?>> dependencies;
 
-    MetadataContainer(Builder builder) {
+    TypeMetadataContainer(Builder builder) {
         this.name = builder.name;
         this.sourceClass = builder.sourceClass;
         this.dependencies = builder.dependencies;
@@ -56,7 +56,7 @@ public class MetadataContainer {
             return this;
         }
 
-        public MetadataContainer build() {
+        public TypeMetadataContainer build() {
             if (name == null) {
                 throw new BeanDefinitionCreateException("Can't create ClassMetadataContainer: name can't be null...");
             }
@@ -68,7 +68,7 @@ public class MetadataContainer {
             if (dependencies == null) {
                 this.dependencies = List.of();
             }
-            return new MetadataContainer(this);
+            return new TypeMetadataContainer(this);
         }
     }
 }

@@ -1,7 +1,7 @@
 package com.github.codedissection.easyspring.bootstrap;
 
 import com.github.codedissection.easyspring.bean.resolver.BeanDefinitionSorter;
-import com.github.codedissection.easyspring.bootstrap.dto.MetadataContainer;
+import com.github.codedissection.easyspring.bootstrap.dto.TypeMetadataContainer;
 import com.github.codedissection.easyspring.definition.BeanDefinition;
 
 import java.util.List;
@@ -14,10 +14,10 @@ public class ContextPipeline {
 
     public void process(String packageToScan) {
         //Phase 1. Scan classpath for annotated classes
-        List<MetadataContainer> classInfos = pipelineWorker.getMetadataConfiguration(packageToScan);
+        List<TypeMetadataContainer> classInfos = pipelineWorker.getMetadataConfiguration(packageToScan);
 
         //Phase 2. Create bean definitions
-        Map<String, BeanDefinition> definitions = pipelineWorker.createDefinitions(classInfos);
+        Map<String, BeanDefinition> definitions = pipelineWorker.createBeanDefinitions(classInfos);
 
         //Phase 3. Topological sort
         List<BeanDefinition> sortedDefinitions = beanDefinitionSorter.sortBeanDefinitions(definitions);

@@ -94,9 +94,9 @@ public class DefinitionFactory {
                 if (typeDependencyImplMap.containsKey(ascendant)) {
                     typeDependencyImplMap.get(ascendant).add(type);
                 } else {
-                    var list = new HashSet<Class<?>>();
-                    list.add(type);
-                    typeDependencyImplMap.put(ascendant, list);
+                    Set<Class<?>> set = ConcurrentHashMap.newKeySet();
+                    set.add(type);
+                    typeDependencyImplMap.put(ascendant, set);
                 }
             }
         }

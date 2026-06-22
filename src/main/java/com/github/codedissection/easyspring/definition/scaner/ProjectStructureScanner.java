@@ -43,42 +43,6 @@ public class ProjectStructureScanner {
         }
     }
 
-//    public Map<Class<?>, List<Class<?>>> getProjectHierarchy(List<TypeMetadataContainer> projectTypes) {
-//        Map<Class<?>, List<Class<?>>> projectHierarchy = new HashMap<>();
-//        for (TypeMetadataContainer container : projectTypes) {
-//            Class<?> currentNode = container.getSourceClass();
-//            var parents = invertDFS(currentNode, new HashSet<>());
-//            for (Class<?> node : parents) {
-//                if (projectHierarchy.containsKey(node)) {
-//                    projectHierarchy.get(node).add(currentNode);
-//                } else {
-//                    var list = new ArrayList<Class<?>>();
-//                    list.add(currentNode);
-//                    projectHierarchy.put(node, list);
-//                }
-//            }
-//        }
-//        return projectHierarchy;
-//    }
-//
-//    private Set<Class<?>> invertDFS(Class<?> currentType, Set<Class<?>> parents) {
-//        if (currentType == null || currentType == Object.class) {
-//            return parents;
-//        }
-//        Class<?> superClass = currentType.getSuperclass();
-//        List<Class<?>> superInterfaces = Arrays.asList(currentType.getInterfaces());
-//        var ancestors = new ArrayList<Class<?>>();
-//        if (superClass != null && superClass != Object.class) {
-//            ancestors.add(superClass);
-//        }
-//        ancestors.addAll(superInterfaces);
-//        for (Class<?> clazz : ancestors) {
-//            invertDFS(clazz, parents);
-//        }
-//        parents.add(currentType);
-//        return parents;
-//    }
-
     private Class<?> validateClass(Class<?> clazz) {
         if (clazz.isEnum() ||
                 clazz.isInterface() ||

@@ -39,7 +39,7 @@ public class BeanFactory {
         Constructor<?> constructor = constructors[0];
         constructor.setAccessible(true);
         try {
-            return (T) constructor.newInstance(beansForImport);
+            return (T) constructor.newInstance(beansForImport.toArray());
         } catch (InvocationTargetException | InstantiationException | IllegalAccessException e) {
             throw new BeanCreateException("Failed phase 3: can't instantiate object for class " + definition.getSourceClass().getName(), e);
         }

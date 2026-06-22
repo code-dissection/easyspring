@@ -18,15 +18,15 @@ public class BeanFactory {
         this.beanStorage = beanStorage;
     }
 
-    public Map<Class<?>, Object> createBeanRegistry(List<BeanDefinition> definitions) {
-        var keyBeanPairs = new HashMap<Class<?>, Object>();
+    public Map<Class<?>, Object> getBeanIndex(List<BeanDefinition> definitions) {
+        var beanIndex = new HashMap<Class<?>, Object>();
         for (BeanDefinition definition : definitions) {
             List<Class<?>> dependencies = definition.getDependencies();
             List<Object> beans = beanStorage.getBeans(dependencies); //конкретные реализации. на один класс может быть ровно 1 бин, не более.
-            Object bean = createBean(definition, beans);
-            keyBeanPairs.put(definition.getSourceClass(), bean);
+            var bean = createBean(definition, beans);
+            beanIndex.put(definition.getSourceClass(), bean);
         }
-        return keyBeanPairs;
+        return beanIndex;
     }
 
     private <T> T createBean(BeanDefinition definition, List<Object> beansForImport) {
@@ -39,7 +39,9 @@ public class BeanFactory {
         Constructor<?> constructor = constructors[0];
         constructor.setAccessible(true);
         try {
-            return (T) constructor.newInstance(beansForImport.toArray());
+            var bean = constructor.newInstance(beansForImport.toArray());
+            beanStorage.saveBean(definition.getSourceClass(), bean);
+            return (T) bean;
         } catch (InvocationTargetException | InstantiationException | IllegalAccessException e) {
             throw new BeanCreateException("Failed phase 3: can't instantiate object for class " + definition.getSourceClass().getName(), e);
         }

@@ -1,7 +1,7 @@
 package com.github.codedissection.easyspring.definition.scaner;
 
-import com.github.codedissection.easyspring.definition.dto.TypeMetadataContainer;
 import com.github.codedissection.easyspring.definition.annotation.root.EasySpringAnnotation;
+import com.github.codedissection.easyspring.definition.dto.TypeMetadataContainer;
 import com.github.codedissection.easyspring.definition.exception.BeanDefinitionCreateException;
 import io.github.classgraph.ClassGraph;
 import io.github.classgraph.ClassInfo;
@@ -9,7 +9,9 @@ import io.github.classgraph.ScanResult;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Modifier;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Stream;
 
 public class ProjectStructureScanner {
@@ -22,7 +24,10 @@ public class ProjectStructureScanner {
                 .enableAnnotationInfo();
 
         try (ScanResult result = scanner.scan()) {
-            var classes = result.getClassesWithAnnotation(EasySpringAnnotation.class.getName());
+            var classes = result.getClassesWithAnnotation(EasySpringAnnotation.class.getName())
+                    .stream()
+                    .filter(classInfo -> classInfo.getName().startsWith(packageToScan))
+                    .toList();
             for (ClassInfo info : classes) {
                 var sourceClass = validateClass(info.loadClass());
                 var className = info.getName();
@@ -65,32 +70,8 @@ public class ProjectStructureScanner {
     }
 
     private List<Class<?>> getBeanDependencies(ScanResult result, Constructor<?> constructor) {
-        return Arrays.stream(constructor.getParameterTypes())
-                .map(type -> {
-                         Class<?> implementation;
-                         if (type.isInterface()) {
-                             var implementations = result.getClassesImplementing(type.getName()).stream()
-                                     .filter(impl -> impl.hasAnnotation(EasySpringAnnotation.class.getName()))
-                                     .toList();
-                             if (implementations.size() > 1) {
-                                 throw new BeanDefinitionCreateException("Pipeline phase 1 failed: interface " + type.getName() + " has more than 1 implementations");
-                             }
-                             if (implementations.isEmpty()) {
-                                 throw new BeanDefinitionCreateException("Pipeline phase 1 failed: interface " + type.getName() + " has no implementations");
-                             }
-                             implementation = implementations.getFirst().loadClass();
-                         } else {
-                             implementation = type;
-                         }
-                         var shouldUse = implementation.isAnnotationPresent(EasySpringAnnotation.class);
-                         return new DependencyResolution(implementation, shouldUse);
-                     }
-                )
-                .filter(dependencyResolution -> dependencyResolution.shouldUse)
-                .<Class<?>>map(dependencyResolution -> dependencyResolution.implementation)
-                .toList();
+        //TODO Add validation by result
+        return Arrays.asList(constructor.getParameterTypes());
     }
 
-    private record DependencyResolution(Class<?> implementation, boolean shouldUse) {
-    }
 }

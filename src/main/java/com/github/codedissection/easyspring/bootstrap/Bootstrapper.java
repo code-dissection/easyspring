@@ -13,7 +13,6 @@ import java.util.Map;
 
 public final class Bootstrapper {
 
-
     private final DefinitionStorage definitionStorage = new DefinitionStorage();
     private final BeanStorage beanStorage = new BeanStorage();
     private final BeanFactory beanFactory = new BeanFactory(beanStorage);
@@ -21,8 +20,8 @@ public final class Bootstrapper {
     public void process(String packageToScan) {
         fillDefinitionStorage(definitionStorage, packageToScan);
 
-        var beanRegistry = beanFactory.createBeanRegistry(definitionStorage.getSortedDefinitions());
-        beanStorage.saveBeanRegistry(beanRegistry);
+        var beanIndex = beanFactory.getBeanIndex(definitionStorage.getSortedDefinitions());
+        beanStorage.saveBeanRegistry(beanIndex);
     }
 
     private void fillDefinitionStorage(DefinitionStorage definitionStorage, String packageToScan) {

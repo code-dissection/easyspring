@@ -70,32 +70,8 @@ public class ProjectStructureScanner {
     }
 
     private List<Class<?>> getBeanDependencies(ScanResult result, Constructor<?> constructor) {
-        return Arrays.stream(constructor.getParameterTypes())
-                .map(type -> {
-                         Class<?> implementation;
-                         if (type.isInterface()) {
-                             var implementations = result.getClassesImplementing(type.getName()).stream()
-                                     .filter(impl -> impl.hasAnnotation(EasySpringAnnotation.class.getName()))
-                                     .toList();
-                             if (implementations.size() > 1) {
-                                 throw new BeanDefinitionCreateException("Pipeline phase 1 failed: interface " + type.getName() + " has more than 1 implementations");
-                             }
-                             if (implementations.isEmpty()) {
-                                 throw new BeanDefinitionCreateException("Pipeline phase 1 failed: interface " + type.getName() + " has no implementations");
-                             }
-                             implementation = implementations.getFirst().loadClass();
-                         } else {
-                             implementation = type;
-                         }
-                         var shouldUse = implementation.isAnnotationPresent(EasySpringAnnotation.class);
-                         return new DependencyResolution(implementation, shouldUse);
-                     }
-                )
-                .filter(dependencyResolution -> dependencyResolution.shouldUse)
-                .<Class<?>>map(dependencyResolution -> dependencyResolution.implementation)
-                .toList();
+        //TODO Add validation by result
+        return Arrays.asList(constructor.getParameterTypes());
     }
 
-    private record DependencyResolution(Class<?> implementation, boolean shouldUse) {
-    }
 }

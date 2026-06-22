@@ -36,7 +36,7 @@ public class BeanStorage {
         }
     }
 
-    private void saveBean(Class<?> sourceClass, Object bean) {
+    public void saveBean(Class<?> sourceClass, Object bean) {
         List<Class<?>> superTypes = getAllSuperTypes(sourceClass);
         for (Class<?> clazz : superTypes) {
             if (!beanStorage.containsKey(clazz)) {
@@ -66,6 +66,7 @@ public class BeanStorage {
         for (Class<?> clazz : supers) {
             getAllSuperTypes(clazz);
         }
+        supers.add(type);
         return supers;
     }
 

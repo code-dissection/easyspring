@@ -1,4 +1,4 @@
-package com.github.codedissection.easyspring.bootstrap.dto;
+package com.github.codedissection.easyspring.definition.dto;
 
 import com.github.codedissection.easyspring.definition.exception.BeanDefinitionCreateException;
 

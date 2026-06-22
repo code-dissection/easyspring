@@ -71,12 +71,15 @@ public final class BeanDefinition {
 
         public Builder(Class<?> sourceClass, List<Class<?>> dependencies) {
             if (sourceClass == null) {
-                throw new BeanDefinitionCreateException("Can't create BeanDefinition: sourceClass can't be null...");
+                throw new BeanDefinitionCreateException("Can't create BeanDefinition: sourceClass can't be null.");
+            }
+            if (sourceClass.isInterface()){
+                throw new BeanDefinitionCreateException("Can't create BeanDefinition: sourceClass can't be interface");
             }
             this.sourceClass = sourceClass;
 
             if (dependencies == null) {
-                throw new BeanDefinitionCreateException("Can't create BeanDefinition: dependencies can't be null...");
+                throw new BeanDefinitionCreateException("Can't create BeanDefinition: dependencies can't be null.");
             }
             this.dependencies = List.copyOf(dependencies);
         }

@@ -1,6 +1,7 @@
 package com.github.codedissection.easyspring.definition.exception;
 
-public class CircularDependenciesException extends RuntimeException {
+public class CircularDependenciesException extends BeanDefinitionException {
+
     public CircularDependenciesException(String message) {
         super(message);
     }

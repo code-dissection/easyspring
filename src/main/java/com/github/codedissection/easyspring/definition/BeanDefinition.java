@@ -73,7 +73,7 @@ public final class BeanDefinition {
             if (sourceClass == null) {
                 throw new BeanDefinitionCreateException("Can't create BeanDefinition: sourceClass can't be null.");
             }
-            if (sourceClass.isInterface()){
+            if (sourceClass.isInterface()) {
                 throw new BeanDefinitionCreateException("Can't create BeanDefinition: sourceClass can't be interface");
             }
             this.sourceClass = sourceClass;

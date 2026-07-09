@@ -1,37 +1,33 @@
 package com.github.codedissection.easyspring.bootstrap;
 
 import com.github.codedissection.easyspring.bean.factory.BeanFactory;
-import com.github.codedissection.easyspring.bean.storage.BeanStorage;
-import com.github.codedissection.easyspring.definition.BeanDefinition;
-import com.github.codedissection.easyspring.definition.dto.TypeMetadataContainer;
 import com.github.codedissection.easyspring.definition.factory.DefinitionFactory;
-import com.github.codedissection.easyspring.definition.scaner.ProjectStructureScanner;
-import com.github.codedissection.easyspring.definition.storage.DefinitionStorage;
-
-import java.util.List;
-import java.util.Map;
+import com.github.codedissection.easyspring.projectcontext.ProjectContext;
+import com.github.codedissection.easyspring.projectscanner.ProjectStructureScanner;
+import com.github.codedissection.easyspring.topologysorter.MetadataTopologySorter;
 
 public final class Bootstrapper {
 
-    private final DefinitionStorage definitionStorage = new DefinitionStorage();
-    private final BeanStorage beanStorage = new BeanStorage();
-    private final BeanFactory beanFactory = new BeanFactory(beanStorage);
+    public ProjectContext process(String packageToScan) {
 
-    public void process(String packageToScan) {
-        fillDefinitionStorage(definitionStorage, packageToScan);
+        var projectScanner = new ProjectStructureScanner();
+        var projectConfiguration = projectScanner.getProjectConfiguration(packageToScan);
 
-        var beanIndex = beanFactory.getBeanIndex(definitionStorage.getSortedDefinitions());
-        beanStorage.saveBeanRegistry(beanIndex);
-    }
+        var topologySorter = new MetadataTopologySorter();
+        var sortedMetadata = topologySorter.getSortedMetadata(projectConfiguration);
 
-    private void fillDefinitionStorage(DefinitionStorage definitionStorage, String packageToScan) {
-        var projectStructureScanner = new ProjectStructureScanner();
         var definitionFactory = new DefinitionFactory();
+        var definitionMap = definitionFactory.createSortedBeanDefinitionMap(sortedMetadata);
 
-        List<TypeMetadataContainer> classInfos = projectStructureScanner.getProjectMetadataConfiguration(packageToScan);
+        var beanFactory = new BeanFactory();
+        var beans = beanFactory.createBeanMap(definitionMap);
 
-        Map<Class<?>, BeanDefinition> definitions = definitionFactory.createBeanDefinitions(classInfos);
-        List<BeanDefinition> sortedDefinitions = definitionFactory.sortBeanDefinitions(definitions);
-        definitionStorage.saveBeanDefinitions(definitions, sortedDefinitions);
+        var projectContext = new ProjectContext();
+        projectContext.saveDefinitions(definitionMap);
+        projectContext.saveBeans(beans);
+
+        return projectContext;
     }
+
+
 }

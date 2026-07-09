@@ -1,15 +1,16 @@
-package com.github.codedissection.easyspring.definition.dto;
+package com.github.codedissection.easyspring.projectscanner.dto;
 
 import com.github.codedissection.easyspring.definition.exception.BeanDefinitionCreateException;
 
 import java.util.List;
+import java.util.Objects;
 
-public class TypeMetadataContainer {
+public class Metadata {
     private final String name;
     private final Class<?> sourceClass;
     private final List<Class<?>> dependencies;
 
-    TypeMetadataContainer(Builder builder) {
+    Metadata(Builder builder) {
         this.name = builder.name;
         this.sourceClass = builder.sourceClass;
         this.dependencies = builder.dependencies;
@@ -25,6 +26,19 @@ public class TypeMetadataContainer {
 
     public Class<?> getSourceClass() {
         return this.sourceClass;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Metadata metadata = (Metadata) o;
+        return Objects.equals(name, metadata.name) && Objects.equals(sourceClass, metadata.sourceClass) && Objects.equals(dependencies, metadata.dependencies);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, sourceClass, dependencies);
     }
 
     public static class Builder {
@@ -56,7 +70,7 @@ public class TypeMetadataContainer {
             return this;
         }
 
-        public TypeMetadataContainer build() {
+        public Metadata build() {
             if (name == null) {
                 throw new BeanDefinitionCreateException("Can't create ClassMetadataContainer: name can't be null...");
             }
@@ -68,7 +82,7 @@ public class TypeMetadataContainer {
             if (dependencies == null) {
                 this.dependencies = List.of();
             }
-            return new TypeMetadataContainer(this);
+            return new Metadata(this);
         }
     }
 }

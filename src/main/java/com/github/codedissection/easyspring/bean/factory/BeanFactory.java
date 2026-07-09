@@ -1,32 +1,30 @@
 package com.github.codedissection.easyspring.bean.factory;
 
 import com.github.codedissection.easyspring.bean.exception.BeanCreateException;
-import com.github.codedissection.easyspring.bean.storage.BeanStorage;
 import com.github.codedissection.easyspring.definition.BeanDefinition;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 public class BeanFactory {
 
-    private final BeanStorage beanStorage;
+    public LinkedHashMap<Class<?>, Object> createBeanMap(LinkedHashMap<Class<?>, BeanDefinition> definitionMap) {
+        var beanStorage = new BeanStorage();
 
-    public BeanFactory(BeanStorage beanStorage) {
-        this.beanStorage = beanStorage;
-    }
-
-    public Map<Class<?>, Object> getBeanIndex(List<BeanDefinition> definitions) {
-        var beanIndex = new HashMap<Class<?>, Object>();
-        for (BeanDefinition definition : definitions) {
+        for (Map.Entry<Class<?>, BeanDefinition> definitionPair : definitionMap.entrySet()) {
+            var definition = definitionPair.getValue();
             List<Class<?>> dependencies = definition.getDependencies();
-            List<Object> beans = beanStorage.getBeans(dependencies); //конкретные реализации. на один класс может быть ровно 1 бин, не более.
+            List<Object> beans = beanStorage.getResolvedDependencyToObjectList(dependencies);
             var bean = createBean(definition, beans);
-            beanIndex.put(definition.getSourceClass(), bean);
+            beanStorage.saveBean(definition.getSourceClass(), bean);
         }
-        return beanIndex;
+        return (LinkedHashMap<Class<?>, Object>) Collections.unmodifiableMap(beanStorage.getBeanMap());
     }
 
     private <T> T createBean(BeanDefinition definition, List<Object> beansForImport) {
@@ -40,10 +38,34 @@ public class BeanFactory {
         constructor.setAccessible(true);
         try {
             var bean = constructor.newInstance(beansForImport.toArray());
-            beanStorage.saveBean(definition.getSourceClass(), bean);
             return (T) bean;
         } catch (InvocationTargetException | InstantiationException | IllegalAccessException e) {
             throw new BeanCreateException("Failed phase 3: can't instantiate object for class " + definition.getSourceClass().getName(), e);
+        }
+    }
+
+
+    static class BeanStorage {
+        Map<Class<?>, Object> beanStorage = new HashMap<>();
+
+        private void saveBean(Class<?> key, Object bean){
+            beanStorage.put(key, bean);
+        }
+
+        private Object getBeanByType(Class<?> type){
+            return beanStorage.get(type);
+        }
+
+        private List<Object> getResolvedDependencyToObjectList(List<Class<?>> dependencies) {
+            var list = new ArrayList<>();
+            for (Class<?> dependency: dependencies){
+                list.add(getBeanByType(dependency));
+            }
+            return list;
+        }
+
+        private Map<Class<?>, Object> getBeanMap(){
+            return beanStorage;
         }
     }
 }

@@ -1,6 +1,6 @@
-package com.github.codedissection.easyspring.definition.annotation;
+package com.github.codedissection.easyspring.projectscanner.annotation;
 
-import com.github.codedissection.easyspring.definition.annotation.root.EasySpringAnnotation;
+import com.github.codedissection.easyspring.projectscanner.annotation.root.EasySpringAnnotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

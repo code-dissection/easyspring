@@ -1,4 +1,4 @@
-package com.github.codedissection.easyspring.projectscanner.dto;
+package com.github.codedissection.easyspring.scanner.dto;
 
 import com.github.codedissection.easyspring.definition.exception.BeanDefinitionCreateException;
 

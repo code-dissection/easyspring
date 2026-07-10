@@ -1,7 +1,7 @@
 package com.github.codedissection.easyspring;
 
 import com.github.codedissection.easyspring.bootstrap.Bootstrapper;
-import com.github.codedissection.easyspring.projectcontext.ProjectContext;
+import com.github.codedissection.easyspring.context.ProjectContext;
 
 import java.util.Objects;
 

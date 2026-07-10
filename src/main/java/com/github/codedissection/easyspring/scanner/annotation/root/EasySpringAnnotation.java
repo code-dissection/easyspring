@@ -1,4 +1,4 @@
-package com.github.codedissection.easyspring.projectscanner.annotation.root;
+package com.github.codedissection.easyspring.scanner.annotation.root;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

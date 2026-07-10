@@ -4,7 +4,6 @@ import com.github.codedissection.easyspring.definition.BeanDefinition;
 import com.github.codedissection.easyspring.projectcontext.storage.BeanStorage;
 import com.github.codedissection.easyspring.projectcontext.storage.DefinitionStorage;
 
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class ProjectContext {
@@ -16,7 +15,7 @@ public class ProjectContext {
         definitionStorage.saveBeanDefinitions(definitions);
     }
 
-    public void saveBeans(LinkedHashMap<Class<?>, Object> beans) {
+    public void saveBeans(Map<Class<?>, Object> beans) {
         beanStorage.saveBeans(beans);
     }
 }

@@ -14,7 +14,7 @@ import java.util.Map;
 
 public class BeanFactory {
 
-    public LinkedHashMap<Class<?>, Object> createBeanMap(LinkedHashMap<Class<?>, BeanDefinition> definitionMap) {
+    public Map<Class<?>, Object> createBeanMap(LinkedHashMap<Class<?>, BeanDefinition> definitionMap) {
         var beanStorage = new BeanStorage();
 
         for (Map.Entry<Class<?>, BeanDefinition> definitionPair : definitionMap.entrySet()) {
@@ -24,7 +24,7 @@ public class BeanFactory {
             var bean = createBean(definition, beans);
             beanStorage.saveBean(definition.getSourceClass(), bean);
         }
-        return (LinkedHashMap<Class<?>, Object>) Collections.unmodifiableMap(beanStorage.getBeanMap());
+        return Collections.unmodifiableMap(beanStorage.getBeanMap());
     }
 
     private <T> T createBean(BeanDefinition definition, List<Object> beansForImport) {

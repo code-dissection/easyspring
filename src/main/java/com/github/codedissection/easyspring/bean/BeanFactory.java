@@ -1,11 +1,14 @@
-package com.github.codedissection.easyspring.bean.factory;
+package com.github.codedissection.easyspring.bean;
 
 import com.github.codedissection.easyspring.bean.exception.BeanCreateException;
-import com.github.codedissection.easyspring.definition.BeanDefinition;
+import com.github.codedissection.easyspring.bean.exception.message.MessageTemplate;
+import com.github.codedissection.easyspring.definition.definition.BeanDefinition;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Parameter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -16,7 +19,6 @@ public class BeanFactory {
 
     public Map<Class<?>, Object> createBeanMap(LinkedHashMap<Class<?>, BeanDefinition> definitionMap) {
         var beanStorage = new BeanStorage();
-
         for (Map.Entry<Class<?>, BeanDefinition> definitionPair : definitionMap.entrySet()) {
             var definition = definitionPair.getValue();
             List<Class<?>> dependencies = definition.getDependencies();
@@ -32,39 +34,59 @@ public class BeanFactory {
                 .getSourceClass()
                 .getDeclaredConstructors();
         if (constructors.length > 1) {
-            throw new BeanCreateException("Failed phase 2: more than 1 constructor in class " + definition.getSourceClass().getName());
+            throw new BeanCreateException(String.format(
+                    MessageTemplate.MULTIPLE_CONSTRUCTORS_ERROR_TEMPLATE,
+                    definition.getSourceClass().getName(),
+                    constructors.length
+            ));
         }
         Constructor<?> constructor = constructors[0];
         constructor.setAccessible(true);
         try {
             var bean = constructor.newInstance(beansForImport.toArray());
             return (T) bean;
-        } catch (InvocationTargetException | InstantiationException | IllegalAccessException e) {
-            throw new BeanCreateException("Failed phase 3: can't instantiate object for class " + definition.getSourceClass().getName(), e);
+        } catch (InvocationTargetException | InstantiationException | IllegalArgumentException |
+                 IllegalAccessException e) {
+            String rootCause = "Unknown reason";
+            if (e instanceof InvocationTargetException)
+                rootCause = "Smth wrong with your code in constructor";
+            if (e instanceof InstantiationException)
+                rootCause = "It seems you try to instantiate interface or abstract class";
+            if (e instanceof IllegalArgumentException)
+                rootCause = "It seems arguments order is damaged";
+            throw new BeanCreateException(String.format(
+                    MessageTemplate.REFLECTION_INSTANTIATION_ERROR_TEMPLATE,
+                    definition.getSourceClass().getName(),
+                    Arrays.stream(constructor.getParameters())
+                            .map(Parameter::getName)
+                            .toList(),
+                    beansForImport.stream()
+                            .map(it -> (it == null) ? "null" : it.getClass().getName())
+                            .toList(),
+                    rootCause), e);
         }
     }
-
 
     static class BeanStorage {
         Map<Class<?>, Object> beanStorage = new HashMap<>();
 
-        private void saveBean(Class<?> key, Object bean){
+        private void saveBean(Class<?> key, Object bean) {
             beanStorage.put(key, bean);
         }
 
-        private Object getBeanByType(Class<?> type){
+        private Object getBeanByType(Class<?> type) {
             return beanStorage.get(type);
         }
 
         private List<Object> getResolvedDependencyToObjectList(List<Class<?>> dependencies) {
             var list = new ArrayList<>();
-            for (Class<?> dependency: dependencies){
+            for (Class<?> dependency : dependencies) {
                 list.add(getBeanByType(dependency));
             }
             return list;
         }
 
-        private Map<Class<?>, Object> getBeanMap(){
+        private Map<Class<?>, Object> getBeanMap() {
             return beanStorage;
         }
     }

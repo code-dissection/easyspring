@@ -2,7 +2,7 @@ package com.github.codedissection.easyspring.topologysorter;
 
 import com.github.codedissection.easyspring.topologysorter.enums.State;
 import com.github.codedissection.easyspring.topologysorter.exception.CircularDependencyException;
-import com.github.codedissection.easyspring.projectscanner.dto.Metadata;
+import com.github.codedissection.easyspring.scanner.dto.Metadata;
 
 import java.util.ArrayList;
 import java.util.Collections;

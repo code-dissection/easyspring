@@ -2,15 +2,15 @@ package com.github.codedissection.easyspring.bootstrap;
 
 import com.github.codedissection.easyspring.bean.BeanFactory;
 import com.github.codedissection.easyspring.definition.DefinitionFactory;
-import com.github.codedissection.easyspring.projectcontext.ProjectContext;
-import com.github.codedissection.easyspring.projectscanner.ProjectStructureScanner;
+import com.github.codedissection.easyspring.context.ProjectContext;
+import com.github.codedissection.easyspring.scanner.ProjectScanner;
 import com.github.codedissection.easyspring.topologysorter.MetadataTopologySorter;
 
 public final class Bootstrapper {
 
     public ProjectContext process(String packageToScan) {
 
-        var projectScanner = new ProjectStructureScanner();
+        var projectScanner = new ProjectScanner();
         var projectConfiguration = projectScanner.getProjectConfiguration(packageToScan);
 
         var topologySorter = new MetadataTopologySorter();

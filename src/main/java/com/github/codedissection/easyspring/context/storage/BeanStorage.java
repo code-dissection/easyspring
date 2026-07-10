@@ -1,4 +1,4 @@
-package com.github.codedissection.easyspring.projectcontext.storage;
+package com.github.codedissection.easyspring.context.storage;
 
 import java.util.Collections;
 import java.util.Map;

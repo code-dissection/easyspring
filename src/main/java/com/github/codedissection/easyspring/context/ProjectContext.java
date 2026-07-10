@@ -1,8 +1,8 @@
-package com.github.codedissection.easyspring.projectcontext;
+package com.github.codedissection.easyspring.context;
 
-import com.github.codedissection.easyspring.definition.definition.BeanDefinition;
-import com.github.codedissection.easyspring.projectcontext.storage.BeanStorage;
-import com.github.codedissection.easyspring.projectcontext.storage.DefinitionStorage;
+import com.github.codedissection.easyspring.definition.beandefinition.BeanDefinition;
+import com.github.codedissection.easyspring.context.storage.BeanStorage;
+import com.github.codedissection.easyspring.context.storage.DefinitionStorage;
 
 import java.util.Map;
 

@@ -1,4 +1,4 @@
-package com.github.codedissection.easyspring.definition.definition;
+package com.github.codedissection.easyspring.definition.beandefinition;
 
 import com.github.codedissection.easyspring.definition.exception.BeanDefinitionCreateException;
 import com.github.codedissection.easyspring.definition.enums.BeanInstantiationStrategy;
@@ -10,11 +10,8 @@ import java.util.Objects;
 public final class BeanDefinition {
 
     private final Class<?> sourceClass;
-
     private final List<Class<?>> dependencies;
-
     private final BeanReuseStrategy beanReuseStrategy;
-
     private final BeanInstantiationStrategy beanInstantiationStrategy;
 
     private BeanDefinition(Builder builder) {
@@ -69,18 +66,8 @@ public final class BeanDefinition {
         private BeanReuseStrategy beanReuseStrategy = BeanReuseStrategy.SINGLETON;
         private BeanInstantiationStrategy beanInstantiationStrategy = BeanInstantiationStrategy.EAGER;
 
-        public Builder(Class<?> sourceClass, List<Class<?>> dependencies) {
-            if (sourceClass == null) {
-                throw new BeanDefinitionCreateException("Can't create BeanDefinition: sourceClass can't be null.");
-            }
-            if (sourceClass.isInterface()) {
-                throw new BeanDefinitionCreateException("Can't create BeanDefinition: sourceClass can't be interface");
-            }
+        public Builder(Class<?> sourceClass, List<Class<?>> dependencies) throws BeanDefinitionCreateException {
             this.sourceClass = sourceClass;
-
-            if (dependencies == null) {
-                throw new BeanDefinitionCreateException("Can't create BeanDefinition: dependencies can't be null.");
-            }
             this.dependencies = List.copyOf(dependencies);
         }
 
@@ -102,5 +89,4 @@ public final class BeanDefinition {
             return new BeanDefinition(this);
         }
     }
-
 }

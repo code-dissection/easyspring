@@ -1,4 +1,4 @@
-package com.github.codedissection.easyspring.projectscanner.exception;
+package com.github.codedissection.easyspring.scanner.exception;
 
 public abstract class ProjectScannerException extends RuntimeException {
 

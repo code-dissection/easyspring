@@ -1,21 +1,20 @@
-package com.github.codedissection.easyspring.projectscanner;
+package com.github.codedissection.easyspring.scanner;
 
-import com.github.codedissection.easyspring.projectscanner.annotation.root.EasySpringAnnotation;
 import com.github.codedissection.easyspring.definition.exception.BeanDefinitionCreateException;
-import com.github.codedissection.easyspring.projectscanner.dto.Metadata;
+import com.github.codedissection.easyspring.scanner.annotation.root.EasySpringAnnotation;
+import com.github.codedissection.easyspring.scanner.dto.Metadata;
 import io.github.classgraph.ClassGraph;
 import io.github.classgraph.ClassInfo;
 import io.github.classgraph.ScanResult;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Modifier;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
 
-public class ProjectStructureScanner {
+public class ProjectScanner {
 
     public Set<Metadata> getProjectConfiguration(String packageToScan) {
         Set<Metadata> classMetadataStorage = new HashSet<>();
@@ -77,7 +76,7 @@ public class ProjectStructureScanner {
 
     private List<Class<?>> getBeanDependencies(Constructor<?> constructor) {
         //TODO Add validation by result
-        return Arrays.asList(constructor.getParameterTypes());
+        return List.of(constructor.getParameterTypes());
     }
 
 }

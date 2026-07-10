@@ -1,9 +1,9 @@
 package com.github.codedissection.easyspring.definition;
 
-import com.github.codedissection.easyspring.definition.definition.BeanDefinition;
+import com.github.codedissection.easyspring.definition.beandefinition.BeanDefinition;
 import com.github.codedissection.easyspring.definition.exception.MissingImplementationException;
 import com.github.codedissection.easyspring.definition.exception.MultipleImplementationException;
-import com.github.codedissection.easyspring.projectscanner.dto.Metadata;
+import com.github.codedissection.easyspring.scanner.dto.Metadata;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -11,6 +11,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import static com.github.codedissection.easyspring.definition.exception.message.MessageTemplate.MULTIPLE_IMPLEMENTATIONS_ERROR_TEMPLATE;
+import static com.github.codedissection.easyspring.definition.exception.message.MessageTemplate.RESOLVED_IMPLEMENTATION_ERROR_TEMPLATE;
 
 public class DefinitionFactory {
 
@@ -23,7 +26,10 @@ public class DefinitionFactory {
                     .<Class<?>>map(rawType -> {
                         var resolvedType = resolvedTypes.get(rawType);
                         if (resolvedType == null)
-                            throw new MissingImplementationException("There is no resolved implementation for type " + rawType);
+                            throw new MissingImplementationException(String.format(
+                                    RESOLVED_IMPLEMENTATION_ERROR_TEMPLATE,
+                                    rawType
+                            ));
                         return resolvedType;
                     })
                     .toList();
@@ -37,13 +43,20 @@ public class DefinitionFactory {
     private Map<Class<?>, Class<?>> getResolvedTypes(List<Metadata> containers) {
         var flattenHierarchy = new LinkedHashMap<Class<?>, Class<?>>();
         for (Metadata container : containers) {
-            var clazz = container.getSourceClass();
-            var ancestors = getAllClassAncestors(clazz);
-            flattenHierarchy.put(clazz, clazz);
+            var child = container.getSourceClass();
+            var ancestors = getAllClassAncestors(child);
+            flattenHierarchy.put(child, child);
             for (Class<?> ancestor : ancestors) {
-                if (flattenHierarchy.putIfAbsent(ancestor, clazz) != null) {
-                    throw new MultipleImplementationException("Not unique impl for type " + ancestor.getName());
+                var alreadyExistChild = flattenHierarchy.get(ancestor);
+                if (alreadyExistChild != null) {
+                    throw new MultipleImplementationException(String.format(
+                            MULTIPLE_IMPLEMENTATIONS_ERROR_TEMPLATE,
+                            ancestor,
+                            child,
+                            alreadyExistChild
+                    ));
                 }
+                flattenHierarchy.put(ancestor, child);
             }
         }
         return flattenHierarchy;

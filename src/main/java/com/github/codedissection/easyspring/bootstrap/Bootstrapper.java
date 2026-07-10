@@ -1,7 +1,7 @@
 package com.github.codedissection.easyspring.bootstrap;
 
-import com.github.codedissection.easyspring.bean.factory.BeanFactory;
-import com.github.codedissection.easyspring.definition.factory.DefinitionFactory;
+import com.github.codedissection.easyspring.bean.BeanFactory;
+import com.github.codedissection.easyspring.definition.DefinitionFactory;
 import com.github.codedissection.easyspring.projectcontext.ProjectContext;
 import com.github.codedissection.easyspring.projectscanner.ProjectStructureScanner;
 import com.github.codedissection.easyspring.topologysorter.MetadataTopologySorter;

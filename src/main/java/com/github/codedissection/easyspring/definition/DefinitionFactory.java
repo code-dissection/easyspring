@@ -1,6 +1,6 @@
-package com.github.codedissection.easyspring.definition.factory;
+package com.github.codedissection.easyspring.definition;
 
-import com.github.codedissection.easyspring.definition.BeanDefinition;
+import com.github.codedissection.easyspring.definition.definition.BeanDefinition;
 import com.github.codedissection.easyspring.definition.exception.MissingImplementationException;
 import com.github.codedissection.easyspring.definition.exception.MultipleImplementationException;
 import com.github.codedissection.easyspring.projectscanner.dto.Metadata;

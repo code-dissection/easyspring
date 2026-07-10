@@ -1,6 +1,6 @@
 package com.github.codedissection.easyspring.projectcontext;
 
-import com.github.codedissection.easyspring.definition.BeanDefinition;
+import com.github.codedissection.easyspring.definition.definition.BeanDefinition;
 import com.github.codedissection.easyspring.projectcontext.storage.BeanStorage;
 import com.github.codedissection.easyspring.projectcontext.storage.DefinitionStorage;
 

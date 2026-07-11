@@ -21,22 +21,22 @@ public class BeanFactory {
         var beanStorage = new BeanStorage();
         for (Map.Entry<Class<?>, BeanDefinition> definitionPair : definitionMap.entrySet()) {
             var definition = definitionPair.getValue();
-            List<Class<?>> dependencies = definition.getDependencies();
+            List<Class<?>> dependencies = definition.dependencies();
             List<Object> beans = beanStorage.getResolvedDependencyToObjectList(dependencies);
             var bean = createBean(definition, beans);
-            beanStorage.saveBean(definition.getSourceClass(), bean);
+            beanStorage.saveBean(definition.sourceClass(), bean);
         }
         return Collections.unmodifiableMap(beanStorage.getBeanMap());
     }
 
     private <T> T createBean(BeanDefinition definition, List<Object> beansForImport) {
         Constructor<?>[] constructors = definition
-                .getSourceClass()
+                .sourceClass()
                 .getDeclaredConstructors();
         if (constructors.length > 1) {
             throw new BeanCreateException(String.format(
                     MessageTemplate.MULTIPLE_CONSTRUCTORS_ERROR_TEMPLATE,
-                    definition.getSourceClass().getName(),
+                    definition.sourceClass().getName(),
                     constructors.length
             ));
         }
@@ -56,7 +56,7 @@ public class BeanFactory {
                 rootCause = "It seems arguments order is damaged";
             throw new BeanCreateException(String.format(
                     MessageTemplate.REFLECTION_INSTANTIATION_ERROR_TEMPLATE,
-                    definition.getSourceClass().getName(),
+                    definition.sourceClass().getName(),
                     Arrays.stream(constructor.getParameters())
                             .map(Parameter::getName)
                             .toList(),

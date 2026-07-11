@@ -1,9 +1,9 @@
 package com.github.codedissection.easyspring.definition;
 
-import com.github.codedissection.easyspring.definition.beandefinition.BeanDefinition;
+import com.github.codedissection.easyspring.definition.model.BeanDefinition;
 import com.github.codedissection.easyspring.definition.exception.MissingImplementationException;
 import com.github.codedissection.easyspring.definition.exception.MultipleImplementationException;
-import com.github.codedissection.easyspring.scanner.dto.Metadata;
+import com.github.codedissection.easyspring.scanner.model.TypeMetadata;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -17,12 +17,12 @@ import static com.github.codedissection.easyspring.definition.exception.message.
 
 public class DefinitionFactory {
 
-    public LinkedHashMap<Class<?>, BeanDefinition> createSortedBeanDefinitionMap(List<Metadata> containers) {
+    public LinkedHashMap<Class<?>, BeanDefinition> createSortedBeanDefinitionMap(List<TypeMetadata> containers) {
         var definitionMap = new LinkedHashMap<Class<?>, BeanDefinition>();
         var resolvedTypes = getResolvedTypes(containers);
-        for (Metadata container : containers) {
-            var sourceClass = container.getSourceClass();
-            var dependencies = container.getDependencies().stream()
+        for (TypeMetadata container : containers) {
+            var sourceClass = container.sourceClass();
+            var dependencies = container.dependencies().stream()
                     .<Class<?>>map(rawType -> {
                         var resolvedType = resolvedTypes.get(rawType);
                         if (resolvedType == null)
@@ -40,10 +40,10 @@ public class DefinitionFactory {
         return definitionMap;
     }
 
-    private Map<Class<?>, Class<?>> getResolvedTypes(List<Metadata> containers) {
+    private Map<Class<?>, Class<?>> getResolvedTypes(List<TypeMetadata> containers) {
         var flattenHierarchy = new LinkedHashMap<Class<?>, Class<?>>();
-        for (Metadata container : containers) {
-            var child = container.getSourceClass();
+        for (TypeMetadata container : containers) {
+            var child = container.sourceClass();
             var ancestors = getAllClassAncestors(child);
             flattenHierarchy.put(child, child);
             for (Class<?> ancestor : ancestors) {

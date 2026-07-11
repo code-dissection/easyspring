@@ -2,7 +2,7 @@ package com.github.codedissection.easyspring.topologysorter;
 
 import com.github.codedissection.easyspring.topologysorter.enums.State;
 import com.github.codedissection.easyspring.topologysorter.exception.CircularDependencyException;
-import com.github.codedissection.easyspring.scanner.dto.Metadata;
+import com.github.codedissection.easyspring.scanner.model.TypeMetadata;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -15,25 +15,25 @@ import java.util.Set;
 
 public class MetadataTopologySorter {
 
-    public List<Metadata> getSortedMetadata(Set<Metadata> containers) {
-        var sorted = new ArrayList<Metadata>();
+    public List<TypeMetadata> getSortedMetadata(Set<TypeMetadata> containers) {
+        var sorted = new ArrayList<TypeMetadata>();
         var nodeState = new HashMap<State, Set<Class<?>>>();
         nodeState.put(State.GREY, new HashSet<>());
         nodeState.put(State.BLACK, new HashSet<>());
-        var registry = new HashMap<Class<?>, Metadata>();
-        for (Metadata container : containers) {
-            registry.put(container.getSourceClass(), container);
+        var registry = new HashMap<Class<?>, TypeMetadata>();
+        for (TypeMetadata container : containers) {
+            registry.put(container.sourceClass(), container);
         }
 
-        for (Metadata container : containers) {
-            var clazz = container.getSourceClass();
+        for (TypeMetadata container : containers) {
+            var clazz = container.sourceClass();
             dfs(clazz, sorted, nodeState, registry);
         }
 
         return sorted;
     }
 
-    private void dfs(Class<?> clazz, List<Metadata> sorted, Map<State, Set<Class<?>>> nodeState, Map<Class<?>, Metadata> registry) {
+    private void dfs(Class<?> clazz, List<TypeMetadata> sorted, Map<State, Set<Class<?>>> nodeState, Map<Class<?>, TypeMetadata> registry) {
 
         if (clazz == null || clazz == Object.class) {
             return;
@@ -50,7 +50,7 @@ public class MetadataTopologySorter {
         nodeState.get(State.GREY).add(clazz);
 
         var container = registry.get(clazz);
-        List<Class<?>> dependencies = (container != null) ? container.getDependencies() : Collections.EMPTY_LIST;
+        List<Class<?>> dependencies = (container != null) ? container.dependencies() : Collections.EMPTY_LIST;
 
         for (Class<?> dependency : dependencies) {
             dfs(dependency, sorted, nodeState, registry);

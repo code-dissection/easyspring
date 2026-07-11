@@ -1,24 +1,31 @@
 package com.github.codedissection.easyspring.scanner;
 
-import com.github.codedissection.easyspring.definition.exception.BeanDefinitionCreateException;
 import com.github.codedissection.easyspring.scanner.annotation.root.EasySpringAnnotation;
-import com.github.codedissection.easyspring.scanner.dto.Metadata;
+import com.github.codedissection.easyspring.scanner.exception.ExternalLibraryException;
+import com.github.codedissection.easyspring.scanner.exception.MultipleConstructorsException;
+import com.github.codedissection.easyspring.scanner.exception.ProjectScannerException;
+import com.github.codedissection.easyspring.scanner.exception.TypeInvariantViolationException;
+import com.github.codedissection.easyspring.scanner.model.TypeMetadata;
 import io.github.classgraph.ClassGraph;
 import io.github.classgraph.ClassInfo;
 import io.github.classgraph.ScanResult;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Modifier;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Stream;
+
+import static com.github.codedissection.easyspring.scanner.exception.message.MessageTemplate.CLASS_GRAPH_ERROR_TEMPLATE;
+import static com.github.codedissection.easyspring.scanner.exception.message.MessageTemplate.COMPONENT_TYPE_ERROR_TEMPLATE;
+import static com.github.codedissection.easyspring.scanner.exception.message.MessageTemplate.MULTIPLE_CONSTRUCTORS_ERROR_TEMPLATE;
 
 public class ProjectScanner {
 
-    public Set<Metadata> getProjectConfiguration(String packageToScan) {
-        Set<Metadata> classMetadataStorage = new HashSet<>();
-        ClassGraph scanner = new ClassGraph()
+    public Set<TypeMetadata> getProjectConfiguration(String packageToScan) {
+        var typeMetadataStorage = new HashSet<TypeMetadata>();
+        var scanner = new ClassGraph()
                 .acceptPackages(packageToScan)
                 .enableClassInfo()
                 .enableAnnotationInfo();
@@ -30,53 +37,52 @@ public class ProjectScanner {
                     .toList();
             for (ClassInfo info : classes) {
                 var sourceClass = validateClass(info.loadClass());
-                var className = info.getName();
                 var constructor = getTheOnlyConstructor(sourceClass);
                 var dependencies = getBeanDependencies(constructor);
-                var container = new Metadata.Builder()
-                        .withName(className)
-                        .withSourceClass(sourceClass)
-                        .withDependencies(dependencies)
-                        .build();
-                classMetadataStorage.add(container);
+                var container = new TypeMetadata(
+                        sourceClass,
+                        dependencies
+                );
+                typeMetadataStorage.add(container);
             }
-            return classMetadataStorage;
-        } catch (BeanDefinitionCreateException e) {
+            return typeMetadataStorage;
+        } catch (ProjectScannerException e) {
             throw e;
         } catch (Exception e) {
-            //TODO Change exception type
-            throw new BeanDefinitionCreateException("Pipeline phase 1 failed: ClassGraph crashed while scanning package " + packageToScan);
+            throw new ExternalLibraryException(String.format(
+                    CLASS_GRAPH_ERROR_TEMPLATE,
+                    packageToScan,
+                    e
+            ));
         }
     }
 
     private Class<?> validateClass(Class<?> clazz) {
         if (clazz.isEnum() ||
-                clazz.isInterface() ||
-                clazz.isAnnotation() ||
-                Modifier.isAbstract(clazz.getModifiers())) {
-            //TODO Change exception type
-            throw new BeanDefinitionCreateException("Pipeline phase 1 failed: invariant violated. Invalid annotated type " + clazz.getName());
-        }
-        if (clazz.getDeclaredConstructors().length == 0) {
-            //TODO Change exception type
-            throw new BeanDefinitionCreateException("Pipeline phase 1 failed: constructor is absent in class " + clazz.getName());
+            clazz.isInterface() ||
+            clazz.isAnnotation() ||
+            Modifier.isAbstract(clazz.getModifiers())) {
+            throw new TypeInvariantViolationException(String.format(
+                    COMPONENT_TYPE_ERROR_TEMPLATE,
+                    clazz.getName()
+            ));
         }
         return clazz;
     }
 
     private Constructor<?> getTheOnlyConstructor(Class<?> sourceClass) {
-        return Stream.of(sourceClass.getDeclaredConstructors())
-                .reduce((first, second) -> {
-                    //TODO Change exception type
-                    throw new BeanDefinitionCreateException("Pipeline phase 1 failed: there is more than 1 constructor in class: " + sourceClass.getName());
-                })
-                //TODO Change exception type
-                .orElseThrow(() -> new BeanDefinitionCreateException("Pipeline phase 1 failed: there is no constructor in class: " + sourceClass.getName()));
+        var constructors = sourceClass.getDeclaredConstructors();
+        if (constructors.length > 1) {
+            throw new MultipleConstructorsException(String.format(
+                    MULTIPLE_CONSTRUCTORS_ERROR_TEMPLATE,
+                    sourceClass.getName())
+            );
+        }
+        return constructors[0];
     }
 
     private List<Class<?>> getBeanDependencies(Constructor<?> constructor) {
-        //TODO Add validation by result
-        return List.of(constructor.getParameterTypes());
+        return Arrays.asList(constructor.getParameterTypes());
     }
 
 }

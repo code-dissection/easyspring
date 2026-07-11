@@ -2,7 +2,7 @@ package com.github.codedissection.easyspring.bean;
 
 import com.github.codedissection.easyspring.bean.exception.BeanCreateException;
 import com.github.codedissection.easyspring.bean.exception.message.MessageTemplate;
-import com.github.codedissection.easyspring.definition.beandefinition.BeanDefinition;
+import com.github.codedissection.easyspring.definition.model.BeanDefinition;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;

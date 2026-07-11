@@ -1,4 +1,4 @@
-package com.github.codedissection.easyspring.definition.beandefinition;
+package com.github.codedissection.easyspring.definition.model;
 
 import com.github.codedissection.easyspring.definition.exception.BeanDefinitionCreateException;
 import com.github.codedissection.easyspring.definition.enums.BeanInstantiationStrategy;

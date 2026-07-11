@@ -1,7 +1,7 @@
 package com.github.codedissection.easyspring.bootstrap;
 
 import com.github.codedissection.easyspring.bean.BeanFactory;
-import com.github.codedissection.easyspring.definition.DefinitionFactory;
+import com.github.codedissection.easyspring.definition.BeanDefinitionFactory;
 import com.github.codedissection.easyspring.context.ProjectContext;
 import com.github.codedissection.easyspring.scanner.ProjectScanner;
 import com.github.codedissection.easyspring.topologysorter.MetadataTopologySorter;
@@ -16,7 +16,7 @@ public final class Bootstrapper {
         var topologySorter = new MetadataTopologySorter();
         var sortedMetadata = topologySorter.getSortedMetadata(projectConfiguration);
 
-        var definitionFactory = new DefinitionFactory();
+        var definitionFactory = new BeanDefinitionFactory();
         var definitionMap = definitionFactory.createSortedBeanDefinitionMap(sortedMetadata);
 
         var beanFactory = new BeanFactory();

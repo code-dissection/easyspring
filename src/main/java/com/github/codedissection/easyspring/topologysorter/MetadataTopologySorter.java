@@ -1,8 +1,8 @@
 package com.github.codedissection.easyspring.topologysorter;
 
+import com.github.codedissection.easyspring.scanner.model.TypeMetadata;
 import com.github.codedissection.easyspring.topologysorter.enums.State;
 import com.github.codedissection.easyspring.topologysorter.exception.CircularDependencyException;
-import com.github.codedissection.easyspring.scanner.model.TypeMetadata;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static com.github.codedissection.easyspring.topologysorter.exception.message.MessageTemplate.CIRCULAR_DEPENDENCY_ERROR_TEMPLATE;
 
 public class MetadataTopologySorter {
 
@@ -24,19 +25,25 @@ public class MetadataTopologySorter {
         for (TypeMetadata container : containers) {
             registry.put(container.sourceClass(), container);
         }
-
         for (TypeMetadata container : containers) {
             var clazz = container.sourceClass();
             dfs(clazz, sorted, nodeState, registry);
         }
-
         return sorted;
     }
 
     private void dfs(Class<?> clazz, List<TypeMetadata> sorted, Map<State, Set<Class<?>>> nodeState, Map<Class<?>, TypeMetadata> registry) {
-
         if (clazz == null || clazz == Object.class) {
             return;
+        }
+
+        if (clazz.isInterface()) {
+            for (Map.Entry<Class<?>, TypeMetadata> entrySet : registry.entrySet()) {
+                if (clazz.isAssignableFrom(entrySet.getKey())) {
+                    clazz = entrySet.getKey();
+                    break;
+                }
+            }
         }
 
         if (nodeState.get(State.BLACK).contains(clazz)) {
@@ -44,13 +51,28 @@ public class MetadataTopologySorter {
         }
 
         if (nodeState.get(State.GREY).contains(clazz)) {
-            throw new CircularDependencyException("Circular dependency detected. Project structure is invalid...");
+            var metadataList = registry.entrySet().stream()
+                    .filter(keyValue -> nodeState.get(State.GREY).contains(keyValue.getKey()))
+                    .map(Map.Entry::getValue)
+                    .toList();
+
+            for (TypeMetadata metadata : metadataList) {
+                Class<?> finalClazz = clazz;
+                var shouldIStop = metadata.dependencies().stream()
+                        .anyMatch(dependency -> dependency.isAssignableFrom(finalClazz));
+                if (shouldIStop) {
+                    throw new CircularDependencyException(String.format(
+                            CIRCULAR_DEPENDENCY_ERROR_TEMPLATE,
+                            clazz.getName(),
+                            metadata.sourceClass().getName()
+                    ));
+                }
+            }
         }
 
+        var metadata = registry.get(clazz);
+        List<Class<?>> dependencies = (metadata == null) ? Collections.emptyList() : metadata.dependencies();
         nodeState.get(State.GREY).add(clazz);
-
-        var container = registry.get(clazz);
-        List<Class<?>> dependencies = (container != null) ? container.dependencies() : Collections.EMPTY_LIST;
 
         for (Class<?> dependency : dependencies) {
             dfs(dependency, sorted, nodeState, registry);
@@ -58,8 +80,9 @@ public class MetadataTopologySorter {
 
         nodeState.get(State.GREY).remove(clazz);
         nodeState.get(State.BLACK).add(clazz);
-        if (container != null) {
-            sorted.add(container);
+
+        if (metadata != null) {
+            sorted.add(metadata);
         }
     }
 }

@@ -1,40 +1,24 @@
 package com.github.codedissection.easyspring.definition.model;
 
-import com.github.codedissection.easyspring.definition.exception.BeanDefinitionCreateException;
 import com.github.codedissection.easyspring.definition.enums.BeanInstantiationStrategy;
 import com.github.codedissection.easyspring.definition.enums.BeanReuseStrategy;
+import com.github.codedissection.easyspring.definition.exception.BeanDefinitionCreateException;
 
 import java.util.List;
 import java.util.Objects;
 
-public final class BeanDefinition {
+public record BeanDefinition(
+        Class<?> sourceClass,
+        List<Class<?>> dependencies,
+        BeanReuseStrategy beanReuseStrategy,
+        BeanInstantiationStrategy beanInstantiationStrategy
+) {
 
-    private final Class<?> sourceClass;
-    private final List<Class<?>> dependencies;
-    private final BeanReuseStrategy beanReuseStrategy;
-    private final BeanInstantiationStrategy beanInstantiationStrategy;
-
-    private BeanDefinition(Builder builder) {
-        this.sourceClass = builder.sourceClass;
-        this.dependencies = builder.dependencies;
-        this.beanReuseStrategy = builder.beanReuseStrategy;
-        this.beanInstantiationStrategy = builder.beanInstantiationStrategy;
-    }
-
-    public Class<?> getSourceClass() {
-        return sourceClass;
-    }
-
-    public List<Class<?>> getDependencies() {
-        return dependencies;
-    }
-
-    public BeanReuseStrategy getBeanReuseStrategy() {
-        return beanReuseStrategy;
-    }
-
-    public BeanInstantiationStrategy getBeanInstantiationStrategy() {
-        return beanInstantiationStrategy;
+    public BeanDefinition {
+        Objects.requireNonNull(sourceClass, "sourceClass must not be null");
+        Objects.requireNonNull(dependencies, "dependencies must not be null");
+        Objects.requireNonNull(beanReuseStrategy, "beanReuseStrategy must not be null");
+        Objects.requireNonNull(beanInstantiationStrategy, "beanInstantiationStrategy must not be null");
     }
 
     @Override
@@ -47,17 +31,7 @@ public final class BeanDefinition {
 
     @Override
     public int hashCode() {
-        return Objects.hash(sourceClass);
-    }
-
-    @Override
-    public String toString() {
-        return "BeanDefinition{" +
-                "sourceClass=" + sourceClass +
-                ", dependencies=" + dependencies +
-                ", beanReuseStrategy=" + beanReuseStrategy +
-                ", beanInstantiationStrategy=" + beanInstantiationStrategy +
-                '}';
+        return Objects.hashCode(sourceClass);
     }
 
     public static class Builder {
@@ -86,7 +60,7 @@ public final class BeanDefinition {
         }
 
         public BeanDefinition build() {
-            return new BeanDefinition(this);
+            return new BeanDefinition(sourceClass, dependencies, beanReuseStrategy, beanInstantiationStrategy);
         }
     }
 }

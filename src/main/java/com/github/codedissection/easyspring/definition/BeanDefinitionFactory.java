@@ -15,7 +15,7 @@ import java.util.Set;
 import static com.github.codedissection.easyspring.definition.exception.message.MessageTemplate.MULTIPLE_IMPLEMENTATIONS_ERROR_TEMPLATE;
 import static com.github.codedissection.easyspring.definition.exception.message.MessageTemplate.RESOLVED_IMPLEMENTATION_ERROR_TEMPLATE;
 
-public class DefinitionFactory {
+public class BeanDefinitionFactory {
 
     public LinkedHashMap<Class<?>, BeanDefinition> createSortedBeanDefinitionMap(List<TypeMetadata> containers) {
         var definitionMap = new LinkedHashMap<Class<?>, BeanDefinition>();

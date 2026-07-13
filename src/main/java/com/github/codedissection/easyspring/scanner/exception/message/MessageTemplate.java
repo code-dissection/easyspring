@@ -7,6 +7,7 @@ public final class MessageTemplate {
     }
 
     public static final String MULTIPLE_CONSTRUCTORS_ERROR_TEMPLATE = """
+            
                                 
             [EasySpring Project scanner failure]: Multiple constructors for class
             │
@@ -18,6 +19,7 @@ public final class MessageTemplate {
             """;
 
     public static final String COMPONENT_TYPE_ERROR_TEMPLATE = """
+            
                                 
             [EasySpring Project scanner failure]: Type is not concrete class 
             │
@@ -29,6 +31,7 @@ public final class MessageTemplate {
             """;
 
     public static final String CLASS_GRAPH_ERROR_TEMPLATE = """
+            
                                 
             [EasySpring Project scanner failure]: Class Graph library crashed while scanning project 
             │

@@ -3,7 +3,8 @@ package com.github.codedissection.easyspring.definition.exception.message;
 public class MessageTemplate {
 
     public static final String RESOLVED_IMPLEMENTATION_ERROR_TEMPLATE = """
-                                
+            
+                                            
             [EasySpring BeanDefinition configuration failure]: Resolved implementation is null
             │
             ├──> Type:
@@ -12,11 +13,12 @@ public class MessageTemplate {
             └──> Type resolution:
                   └──> null 
                                 
-            Solution: Create implementation for type.
+            Solution: Create implementation for type (may be forgot annotation @Managed).
                                 
             """;
 
     public static final String MULTIPLE_IMPLEMENTATIONS_ERROR_TEMPLATE = """
+            
                                 
             [EasySpring BeanDefinition configuration failure]: Multiple implementations for type
             │

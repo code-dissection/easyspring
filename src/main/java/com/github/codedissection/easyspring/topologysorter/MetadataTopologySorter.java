@@ -51,28 +51,38 @@ public class MetadataTopologySorter {
         }
 
         if (nodeState.get(State.GREY).contains(clazz)) {
-            var metadataList = registry.entrySet().stream()
-                    .filter(keyValue -> nodeState.get(State.GREY).contains(keyValue.getKey()))
-                    .map(Map.Entry::getValue)
-                    .toList();
+            var metadataList = new ArrayList<TypeMetadata>();
+            for (Class<?> key : nodeState.get(State.GREY)) {
+                metadataList.add(registry.get(key));
+            }
 
-            for (TypeMetadata metadata : metadataList) {
-                Class<?> finalClazz = clazz;
-                var shouldIStop = metadata.dependencies().stream()
-                        .anyMatch(dependency -> dependency.isAssignableFrom(finalClazz));
-                if (shouldIStop) {
-                    throw new CircularDependencyException(String.format(
-                            CIRCULAR_DEPENDENCY_ERROR_TEMPLATE,
-                            clazz.getName(),
-                            metadata.sourceClass().getName()
-                    ));
+            Class<?>[] cycleChain = new Class[metadataList.size() + 1];
+            for (int i = 0; i <= metadataList.size(); i++) {
+                for (TypeMetadata metadata : metadataList) {
+                    if (metadata.dependencies().contains(clazz)) {
+                        cycleChain[metadataList.size() - i] = metadata.sourceClass();
+                        clazz = metadata.sourceClass();
+                        break;
+                    }
                 }
             }
+
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < cycleChain.length - 1; i++) {
+                var element = cycleChain[i].getName();
+                sb.append(element + " ──> ");
+            }
+            sb.append(cycleChain[cycleChain.length-1].getName());
+
+            throw new CircularDependencyException(String.format(
+                    CIRCULAR_DEPENDENCY_ERROR_TEMPLATE,
+                    sb
+            ));
         }
+        nodeState.get(State.GREY).add(clazz);
 
         var metadata = registry.get(clazz);
         List<Class<?>> dependencies = (metadata == null) ? Collections.emptyList() : metadata.dependencies();
-        nodeState.get(State.GREY).add(clazz);
 
         for (Class<?> dependency : dependencies) {
             dfs(dependency, sorted, nodeState, registry);

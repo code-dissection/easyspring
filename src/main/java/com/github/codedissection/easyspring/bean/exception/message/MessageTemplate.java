@@ -2,6 +2,7 @@ package com.github.codedissection.easyspring.bean.exception.message;
 
 public class MessageTemplate {
     public static final String MULTIPLE_CONSTRUCTORS_ERROR_TEMPLATE = """
+            
                                 
             [EasySpring Bean configuration mistake]: Couldn't choose constructor for injection!
             │
@@ -15,6 +16,7 @@ public class MessageTemplate {
             """;
 
     public static final String REFLECTION_INSTANTIATION_ERROR_TEMPLATE = """
+            
                                 
             [EasySpring Bean creation failure]: Couldn't instantiate bean!
             │

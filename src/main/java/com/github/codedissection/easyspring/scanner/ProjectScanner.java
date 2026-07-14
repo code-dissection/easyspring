@@ -8,8 +8,10 @@ import com.github.codedissection.easyspring.scanner.exception.TypeInvariantViola
 import com.github.codedissection.easyspring.scanner.model.TypeMetadata;
 import io.github.classgraph.ClassGraph;
 import io.github.classgraph.ClassInfo;
+import io.github.classgraph.ClassInfoList;
 import io.github.classgraph.ScanResult;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
@@ -39,9 +41,11 @@ public class ProjectScanner {
                 var sourceClass = validateClass(info.loadClass());
                 var constructor = getTheOnlyConstructor(sourceClass);
                 var dependencies = getBeanDependencies(constructor);
+                var annotations = getAnnotations(info);
                 var container = new TypeMetadata(
                         sourceClass,
-                        dependencies
+                        dependencies,
+                        annotations
                 );
                 typeMetadataStorage.add(container);
             }
@@ -85,4 +89,7 @@ public class ProjectScanner {
         return Arrays.asList(constructor.getParameterTypes());
     }
 
+    private List<Class<?>> getAnnotations(ClassInfo info) {
+        return info.getAnnotations().loadClasses();
+    }
 }

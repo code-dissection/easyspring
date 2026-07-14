@@ -2,6 +2,7 @@ package com.github.codedissection.easyspring.bean;
 
 import com.github.codedissection.easyspring.bean.exception.BeanCreateException;
 import com.github.codedissection.easyspring.bean.exception.message.MessageTemplate;
+import com.github.codedissection.easyspring.definition.enums.BeanReuseStrategy;
 import com.github.codedissection.easyspring.definition.model.BeanDefinition;
 
 import java.lang.reflect.Constructor;
@@ -18,9 +19,11 @@ import java.util.Map;
 public class BeanFactory {
 
     public Map<Class<?>, Object> createBeanMap(LinkedHashMap<Class<?>, BeanDefinition> definitionMap) {
-        var beanStorage = new BeanStorage();
+        var beanStorage = new BeanStorageMap();
         for (Map.Entry<Class<?>, BeanDefinition> definitionPair : definitionMap.entrySet()) {
             var definition = definitionPair.getValue();
+            if (definition.beanReuseStrategy() == BeanReuseStrategy.ONEOFF)
+                continue;
             List<Class<?>> dependencies = definition.dependencies();
             List<Object> beans = beanStorage.getResolvedDependencyToObjectList(dependencies);
             var bean = createBean(definition, beans);
@@ -29,18 +32,8 @@ public class BeanFactory {
         return Collections.unmodifiableMap(beanStorage.getBeanMap());
     }
 
-    private <T> T createBean(BeanDefinition definition, List<Object> beansForImport) {
-        Constructor<?>[] constructors = definition
-                .sourceClass()
-                .getDeclaredConstructors();
-        if (constructors.length > 1) {
-            throw new BeanCreateException(String.format(
-                    MessageTemplate.MULTIPLE_CONSTRUCTORS_ERROR_TEMPLATE,
-                    definition.sourceClass().getName(),
-                    constructors.length
-            ));
-        }
-        Constructor<?> constructor = constructors[0];
+    public <T> T createBean(BeanDefinition definition, List<Object> beansForImport) {
+        var constructor = getConstructor(definition);
         constructor.setAccessible(true);
         try {
             var bean = constructor.newInstance(beansForImport.toArray());
@@ -55,7 +48,7 @@ public class BeanFactory {
             if (e instanceof IllegalArgumentException)
                 rootCause = "It seems arguments order is damaged";
             throw new BeanCreateException(String.format(
-                    MessageTemplate.REFLECTION_INSTANTIATION_ERROR_TEMPLATE,
+                    MessageTemplate.INSTANTIATION_ERROR_TEMPLATE,
                     definition.sourceClass().getName(),
                     Arrays.stream(constructor.getParameters())
                             .map(Parameter::getName)
@@ -67,7 +60,21 @@ public class BeanFactory {
         }
     }
 
-    static class BeanStorage {
+    private Constructor<?> getConstructor(BeanDefinition definition) {
+        Constructor<?>[] constructors = definition
+                .sourceClass()
+                .getDeclaredConstructors();
+        if (constructors.length > 1) {
+            throw new BeanCreateException(String.format(
+                    MessageTemplate.MULTIPLE_CONSTRUCTORS_ERROR_TEMPLATE,
+                    definition.sourceClass().getName(),
+                    constructors.length
+            ));
+        }
+        return constructors[0];
+    }
+
+    static class BeanStorageMap {
         Map<Class<?>, Object> beanStorage = new HashMap<>();
 
         private void saveBean(Class<?> key, Object bean) {

@@ -11,8 +11,8 @@ public class DefinitionStorage {
         this.beanDefinitions = Map.copyOf(beanDefinitions);
     }
 
-    public Map<Class<?>, BeanDefinition> getBeanDefinitions() {
-        return beanDefinitions;
+    public BeanDefinition getBeanDefinition(Class<?> clazz) {
+        return beanDefinitions.get(clazz);
     }
 
 }

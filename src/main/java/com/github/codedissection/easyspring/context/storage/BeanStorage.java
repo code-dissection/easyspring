@@ -14,4 +14,8 @@ public class BeanStorage {
         );
     }
 
+    public Object getBean(Class<?> clazz) {
+        return beanStorage.get(clazz);
+    }
+
 }

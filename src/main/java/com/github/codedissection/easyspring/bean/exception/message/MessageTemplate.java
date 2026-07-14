@@ -15,7 +15,7 @@ public class MessageTemplate {
                                 
             """;
 
-    public static final String REFLECTION_INSTANTIATION_ERROR_TEMPLATE = """
+    public static final String INSTANTIATION_ERROR_TEMPLATE = """
             
                                 
             [EasySpring Bean creation failure]: Couldn't instantiate bean!

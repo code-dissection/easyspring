@@ -7,5 +7,5 @@ package com.github.codedissection.easyspring.definition.enums;
 public enum BeanReuseStrategy {
 
     SINGLETON,
-    PROTOTYPE
+    ONEOFF
 }

@@ -1,8 +1,10 @@
 package com.github.codedissection.easyspring.definition;
 
+import com.github.codedissection.easyspring.definition.enums.BeanReuseStrategy;
 import com.github.codedissection.easyspring.definition.model.BeanDefinition;
 import com.github.codedissection.easyspring.definition.exception.MissingImplementationException;
 import com.github.codedissection.easyspring.definition.exception.MultipleImplementationException;
+import com.github.codedissection.easyspring.scanner.annotation.OneOff;
 import com.github.codedissection.easyspring.scanner.model.TypeMetadata;
 
 import java.util.Arrays;
@@ -33,11 +35,20 @@ public class BeanDefinitionFactory {
                         return resolvedType;
                     })
                     .toList();
+            var beanReuseStrategy = getBeanReuseStrategy(container);
             var beanDefinition = new BeanDefinition.Builder(sourceClass, dependencies)
+                    .withBeanReuseStrategy(beanReuseStrategy)
                     .build();
             definitionMap.put(sourceClass, beanDefinition);
         }
         return definitionMap;
+    }
+
+    private BeanReuseStrategy getBeanReuseStrategy(TypeMetadata container){
+        if (container.annotations().contains(OneOff.class))
+            return BeanReuseStrategy.ONEOFF;
+        else
+            return BeanReuseStrategy.SINGLETON;
     }
 
     private Map<Class<?>, Class<?>> getResolvedTypes(List<TypeMetadata> containers) {

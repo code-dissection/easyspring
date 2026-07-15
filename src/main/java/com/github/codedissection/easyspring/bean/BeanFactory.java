@@ -4,6 +4,7 @@ import com.github.codedissection.easyspring.bean.exception.BeanCreateException;
 import com.github.codedissection.easyspring.bean.exception.message.MessageTemplate;
 import com.github.codedissection.easyspring.definition.enums.BeanReuseStrategy;
 import com.github.codedissection.easyspring.definition.model.BeanDefinition;
+import com.github.codedissection.easyspring.scanner.annotation.Init;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -15,6 +16,11 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+
+import static com.github.codedissection.easyspring.bean.exception.message.MessageTemplate.ILLEGAL_ACCESS_EXCEPTION_ERROR_TEMPLATE;
+import static com.github.codedissection.easyspring.bean.exception.message.MessageTemplate.INIT_METHOD_HAS_PARAMETERS_ERROR_TEMPLATE;
+import static com.github.codedissection.easyspring.bean.exception.message.MessageTemplate.INVOCATION_TARGET_EXCEPTION_ERROR_TEMPLATE;
+import static com.github.codedissection.easyspring.bean.exception.message.MessageTemplate.MULTIPLE_INIT_ANNOTATED_METHODS_ERROR_TEMPLATE;
 
 public class BeanFactory {
 
@@ -37,6 +43,7 @@ public class BeanFactory {
         constructor.setAccessible(true);
         try {
             var bean = constructor.newInstance(beansForImport.toArray());
+            invokeInitAnnotatedMethod(bean);
             return (T) bean;
         } catch (InvocationTargetException | InstantiationException | IllegalArgumentException |
                  IllegalAccessException e) {
@@ -57,6 +64,42 @@ public class BeanFactory {
                             .map(it -> (it == null) ? "null" : it.getClass().getName())
                             .toList(),
                     rootCause), e);
+        }
+    }
+
+    private void invokeInitAnnotatedMethod(Object bean) {
+        var methods = Arrays.stream(bean.getClass().getDeclaredMethods())
+                .filter(method -> method.isAnnotationPresent(Init.class))
+                .toList();
+        if (methods.isEmpty())
+            return;
+        if (methods.size() > 1)
+            throw new BeanCreateException(String.format(
+                    MULTIPLE_INIT_ANNOTATED_METHODS_ERROR_TEMPLATE,
+                    bean.getClass().getName(),
+                    methods
+            ));
+        var method = methods.getFirst();
+        if (method.getParameters().length > 0)
+            throw new BeanCreateException(String.format(
+                    INIT_METHOD_HAS_PARAMETERS_ERROR_TEMPLATE,
+                    bean.getClass().getName(),
+                    method.getName()
+            ));
+        try {
+            method.setAccessible(true);
+            method.invoke(bean);
+        } catch (IllegalAccessException e) {
+            throw new BeanCreateException(String.format(
+                    ILLEGAL_ACCESS_EXCEPTION_ERROR_TEMPLATE,
+                    method.getName()
+            ));
+        } catch (InvocationTargetException e) {
+            var realCause = e.getCause();
+            throw new BeanCreateException(String.format(
+                    INVOCATION_TARGET_EXCEPTION_ERROR_TEMPLATE,
+                    realCause
+            ), realCause);
         }
     }
 

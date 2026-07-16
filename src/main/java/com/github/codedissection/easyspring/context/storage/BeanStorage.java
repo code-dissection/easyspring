@@ -6,7 +6,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class BeanStorage {
 
-    private final ConcurrentHashMap<Class<?>, Object> beanStorage = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<Class<?>, Object> beanStorage = new ConcurrentHashMap<>();
 
     public void saveBeans(Map<Class<?>, Object> beanMap) {
         beanStorage.putAll(
@@ -18,4 +18,11 @@ public class BeanStorage {
         return beanStorage.get(clazz);
     }
 
+    public boolean contains(Class<?> key) {
+        return beanStorage.containsKey(key);
+    }
+
+    public void clear() {
+        beanStorage = null;
+    }
 }

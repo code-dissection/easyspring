@@ -1,4 +1,4 @@
-package com.github.codedissection.easyspring.scanner.annotation;
+package com.github.codedissection.easyspring.context.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -7,5 +7,5 @@ import java.lang.annotation.Target;
 
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Init {
+public @interface Close {
 }

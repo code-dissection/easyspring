@@ -4,10 +4,11 @@ import com.github.codedissection.easyspring.bean.exception.BeanCreateException;
 import com.github.codedissection.easyspring.bean.exception.message.MessageTemplate;
 import com.github.codedissection.easyspring.definition.enums.BeanReuseStrategy;
 import com.github.codedissection.easyspring.definition.model.BeanDefinition;
-import com.github.codedissection.easyspring.scanner.annotation.Init;
+import com.github.codedissection.easyspring.bean.annotation.Init;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -16,6 +17,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static com.github.codedissection.easyspring.bean.exception.message.MessageTemplate.ILLEGAL_ACCESS_EXCEPTION_ERROR_TEMPLATE;
 import static com.github.codedissection.easyspring.bean.exception.message.MessageTemplate.INIT_METHOD_HAS_PARAMETERS_ERROR_TEMPLATE;
@@ -73,12 +75,16 @@ public class BeanFactory {
                 .toList();
         if (methods.isEmpty())
             return;
-        if (methods.size() > 1)
+        if (methods.size() > 1) {
+            var pretty = methods.stream()
+                    .map(Method::getName)
+                    .collect(Collectors.joining(", "));
             throw new BeanCreateException(String.format(
                     MULTIPLE_INIT_ANNOTATED_METHODS_ERROR_TEMPLATE,
                     bean.getClass().getName(),
-                    methods
+                    pretty
             ));
+        }
         var method = methods.getFirst();
         if (method.getParameters().length > 0)
             throw new BeanCreateException(String.format(

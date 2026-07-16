@@ -69,7 +69,7 @@ public class MessageTemplate {
                                 
             [EasySpring Bean creation failure]: User code in @Init annotated method thrown exception
             │
-            └──> Exception:
+            └──> Real cause:
                  └──> %s
                                 
             Solution: We don't know how to fix.

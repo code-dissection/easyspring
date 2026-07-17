@@ -87,4 +87,19 @@ public class MessageTemplate {
             Solution: It seems environment settings restricts access to @Init method.
                                 
             """;
+
+    public static final String INCOMPATIBILITY_TYPES_ERROR_TEMPLATE = """
+            
+                                
+            [EasySpring Bean creation failure]: Can't resolve type
+            │
+            ├──> Bean type:
+            │     └──> %s
+            │
+            └──> Parameter type:
+                  └──> %s 
+                                
+            Solution: Resolve incompatibility of constructor parameter type and settings type.
+                                
+            """;
 }

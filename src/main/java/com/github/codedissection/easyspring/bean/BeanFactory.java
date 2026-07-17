@@ -1,11 +1,11 @@
 package com.github.codedissection.easyspring.bean;
 
+import com.github.codedissection.easyspring.bean.annotation.Init;
 import com.github.codedissection.easyspring.bean.exception.BeanCreateException;
 import com.github.codedissection.easyspring.bean.exception.message.MessageTemplate;
 import com.github.codedissection.easyspring.definition.annotation.ValueFrom;
 import com.github.codedissection.easyspring.definition.enums.BeanReuseStrategy;
 import com.github.codedissection.easyspring.definition.model.BeanDefinition;
-import com.github.codedissection.easyspring.bean.annotation.Init;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import static com.github.codedissection.easyspring.bean.exception.message.MessageTemplate.ILLEGAL_ACCESS_EXCEPTION_ERROR_TEMPLATE;
+import static com.github.codedissection.easyspring.bean.exception.message.MessageTemplate.INCOMPATIBILITY_TYPES_ERROR_TEMPLATE;
 import static com.github.codedissection.easyspring.bean.exception.message.MessageTemplate.INIT_METHOD_HAS_PARAMETERS_ERROR_TEMPLATE;
 import static com.github.codedissection.easyspring.bean.exception.message.MessageTemplate.INVOCATION_TARGET_EXCEPTION_ERROR_TEMPLATE;
 import static com.github.codedissection.easyspring.bean.exception.message.MessageTemplate.MULTIPLE_INIT_ANNOTATED_METHODS_ERROR_TEMPLATE;
@@ -60,7 +61,11 @@ public class BeanFactory {
                     var value = beansForImport.stream()
                             .filter(obj -> type.isAssignableFrom(obj.getClass()))
                             .findFirst()
-                            .orElseThrow(); //TODO Добить красивый эксепшн
+                            .orElseThrow(() -> new BeanCreateException(String.format(
+                                    INCOMPATIBILITY_TYPES_ERROR_TEMPLATE,
+                                    definition.sourceClass(),
+                                    parameter.getType()
+                            )));
                     toInject.add(value);
                 }
             }

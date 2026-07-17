@@ -1,6 +1,5 @@
 package com.github.codedissection.easyspring.definition.model;
 
-import com.github.codedissection.easyspring.definition.enums.BeanInstantiationStrategy;
 import com.github.codedissection.easyspring.definition.enums.BeanReuseStrategy;
 import com.github.codedissection.easyspring.definition.exception.BeanDefinitionCreateException;
 
@@ -10,15 +9,13 @@ import java.util.Objects;
 public record BeanDefinition(
         Class<?> sourceClass,
         List<Class<?>> dependencies,
-        BeanReuseStrategy beanReuseStrategy,
-        BeanInstantiationStrategy beanInstantiationStrategy
+        ClassSettings classSettings,
+        BeanReuseStrategy beanReuseStrategy
 ) {
 
     public BeanDefinition {
         Objects.requireNonNull(sourceClass, "sourceClass must not be null");
         Objects.requireNonNull(dependencies, "dependencies must not be null");
-        Objects.requireNonNull(beanReuseStrategy, "beanReuseStrategy must not be null");
-        Objects.requireNonNull(beanInstantiationStrategy, "beanInstantiationStrategy must not be null");
     }
 
     @Override
@@ -37,12 +34,13 @@ public record BeanDefinition(
     public static class Builder {
         private final Class<?> sourceClass;
         private final List<Class<?>> dependencies;
+        private ClassSettings classSettings;
         private BeanReuseStrategy beanReuseStrategy = BeanReuseStrategy.SINGLETON;
-        private BeanInstantiationStrategy beanInstantiationStrategy = BeanInstantiationStrategy.EAGER;
 
         public Builder(Class<?> sourceClass, List<Class<?>> dependencies) throws BeanDefinitionCreateException {
             this.sourceClass = sourceClass;
             this.dependencies = List.copyOf(dependencies);
+            this.classSettings = new ClassSettings(sourceClass, null);
         }
 
         public Builder withBeanReuseStrategy(BeanReuseStrategy beanReuseStrategy) {
@@ -52,15 +50,14 @@ public record BeanDefinition(
             return this;
         }
 
-        public Builder withBeanInstantiationStrategy(BeanInstantiationStrategy beanInstantiationStrategy) {
-            if (beanInstantiationStrategy != null) {
-                this.beanInstantiationStrategy = beanInstantiationStrategy;
-            }
+        public Builder withBeanSettings(ClassSettings classSettings) {
+            if (classSettings != null)
+                this.classSettings = classSettings;
             return this;
         }
 
         public BeanDefinition build() {
-            return new BeanDefinition(sourceClass, dependencies, beanReuseStrategy, beanInstantiationStrategy);
+            return new BeanDefinition(sourceClass, dependencies, classSettings, beanReuseStrategy);
         }
     }
 }

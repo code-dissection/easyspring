@@ -34,4 +34,16 @@ public class MessageTemplate {
             Solution: Resolve implementations for type.
                                 
             """;
+
+    public static final String MISSING_CONSTRUCTOR_ERROR_TEMPLATE = """
+            
+                                
+            [EasySpring BeanDefinition configuration failure]: Multiple implementations for type
+            │
+            └──> Type:
+                  └──> %s
+                                
+            Solution: Provide constructor for type.
+                                
+            """;
 }

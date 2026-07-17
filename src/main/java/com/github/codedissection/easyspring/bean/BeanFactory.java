@@ -2,11 +2,13 @@ package com.github.codedissection.easyspring.bean;
 
 import com.github.codedissection.easyspring.bean.exception.BeanCreateException;
 import com.github.codedissection.easyspring.bean.exception.message.MessageTemplate;
+import com.github.codedissection.easyspring.definition.annotation.ValueFrom;
 import com.github.codedissection.easyspring.definition.enums.BeanReuseStrategy;
 import com.github.codedissection.easyspring.definition.model.BeanDefinition;
 import com.github.codedissection.easyspring.bean.annotation.Init;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
@@ -44,7 +46,36 @@ public class BeanFactory {
         var constructor = getConstructor(definition);
         constructor.setAccessible(true);
         try {
-            var bean = constructor.newInstance(beansForImport.toArray());
+            var parameters = constructor.getParameters();
+            var toInject = new ArrayList<>();
+            var settings = definition.classSettings().settings();
+            for (Parameter parameter : parameters) {
+                if (parameter.isAnnotationPresent(ValueFrom.class)) {
+                    var key = parameter.getAnnotation(ValueFrom.class).value();
+                    var value = settings.get(key);
+                    var wrappedValue = convertToWrapperType(parameter.getType(), value);
+                    toInject.add(wrappedValue);
+                } else {
+                    var type = parameter.getType();
+                    var value = beansForImport.stream()
+                            .filter(obj -> type.isAssignableFrom(obj.getClass()))
+                            .findFirst()
+                            .orElseThrow(); //TODO Добить красивый эксепшн
+                    toInject.add(value);
+                }
+            }
+            var bean = constructor.newInstance(toInject.toArray());
+
+            Field[] fields = bean.getClass().getDeclaredFields();
+            for (Field field : fields) {
+                if (field.isAnnotationPresent(ValueFrom.class)) {
+                    field.setAccessible(true);
+                    var key = field.getAnnotation(ValueFrom.class).value();
+                    var wrapped = convertToWrapperType(field.getType(), settings.get(key));
+                    field.set(bean, wrapped);
+                }
+            }
+
             invokeInitAnnotatedMethod(bean);
             return (T) bean;
         } catch (InvocationTargetException | InstantiationException | IllegalArgumentException |
@@ -67,6 +98,21 @@ public class BeanFactory {
                             .toList(),
                     rootCause), e);
         }
+    }
+
+    private Object convertToWrapperType(Class<?> targetType, Object rawValue) {
+        if (rawValue == null)
+            return null;
+        var strValue = String.valueOf(rawValue);
+        if (targetType == int.class || targetType == Integer.class)
+            return Integer.parseInt(strValue);
+        if (targetType == long.class || targetType == Long.class)
+            return Long.parseLong(strValue);
+        if (targetType == boolean.class || targetType == Boolean.class)
+            return Boolean.parseBoolean(strValue);
+        if(targetType == String.class)
+            return strValue;
+        return rawValue;
     }
 
     private void invokeInitAnnotatedMethod(Object bean) {
@@ -101,26 +147,28 @@ public class BeanFactory {
                     method.getName()
             ));
         } catch (InvocationTargetException e) {
-            var realCause = e.getCause();
+            var realCause = e.getMessage();
             throw new BeanCreateException(String.format(
                     INVOCATION_TARGET_EXCEPTION_ERROR_TEMPLATE,
                     realCause
-            ), realCause);
+            ), e);
         }
     }
 
     private Constructor<?> getConstructor(BeanDefinition definition) {
-        Constructor<?>[] constructors = definition
+        var constructors = Arrays.stream(definition
                 .sourceClass()
-                .getDeclaredConstructors();
-        if (constructors.length > 1) {
+                .getDeclaredConstructors())
+                .filter(c-> !c.isSynthetic())
+                .toList();
+        if (constructors.size() > 1) {
             throw new BeanCreateException(String.format(
                     MessageTemplate.MULTIPLE_CONSTRUCTORS_ERROR_TEMPLATE,
                     definition.sourceClass().getName(),
-                    constructors.length
+                    constructors.size()
             ));
         }
-        return constructors[0];
+        return constructors.getFirst();
     }
 
     static class BeanStorageMap {

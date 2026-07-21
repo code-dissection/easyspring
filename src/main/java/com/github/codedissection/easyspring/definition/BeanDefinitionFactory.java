@@ -3,6 +3,7 @@ package com.github.codedissection.easyspring.definition;
 import com.github.codedissection.easyspring.definition.annotation.ValueFrom;
 import com.github.codedissection.easyspring.definition.enums.BeanReuseStrategy;
 import com.github.codedissection.easyspring.definition.exception.AbsentConstructorException;
+import com.github.codedissection.easyspring.definition.exception.ScopedTargetProblemException;
 import com.github.codedissection.easyspring.definition.model.BeanDefinition;
 import com.github.codedissection.easyspring.definition.exception.MissingImplementationException;
 import com.github.codedissection.easyspring.definition.exception.MultipleImplementationException;
@@ -23,6 +24,7 @@ import java.util.Set;
 import static com.github.codedissection.easyspring.definition.exception.message.MessageTemplate.MISSING_CONSTRUCTOR_ERROR_TEMPLATE;
 import static com.github.codedissection.easyspring.definition.exception.message.MessageTemplate.MULTIPLE_IMPLEMENTATIONS_ERROR_TEMPLATE;
 import static com.github.codedissection.easyspring.definition.exception.message.MessageTemplate.RESOLVED_IMPLEMENTATION_ERROR_TEMPLATE;
+import static com.github.codedissection.easyspring.definition.exception.message.MessageTemplate.SCOPED_TARGET_PROBLEM_ERROR_TEMPLATE;
 
 public class BeanDefinitionFactory {
 
@@ -48,15 +50,32 @@ public class BeanDefinitionFactory {
                     .withBeanReuseStrategy(beanReuseStrategy)
                     .withBeanSettings(classSettings)
                     .build();
+            validateBeanDefinition(beanDefinition);
             definitionMap.put(sourceClass, beanDefinition);
         }
         return definitionMap;
     }
 
-    private ClassSettings getClassSettings(Class<?> sourceClass, Map<String, Object> settings){
+    private void validateBeanDefinition(BeanDefinition definition) {
+        if (definition.sourceClass().isAnnotationPresent(OneOff.class))
+            return;
+
+        definition.dependencies().stream()
+                .filter(dependency -> dependency.isAnnotationPresent(OneOff.class))
+                .findFirst()
+                .ifPresent(dependency -> {
+                    throw new ScopedTargetProblemException(String.format(
+                            SCOPED_TARGET_PROBLEM_ERROR_TEMPLATE,
+                            definition.sourceClass().getName(),
+                            dependency.getName()
+                    ));
+                });
+    }
+
+    private ClassSettings getClassSettings(Class<?> sourceClass, Map<String, Object> settings) {
         Map<String, Object> localSettings = new HashMap<>();
         Field[] fields = sourceClass.getDeclaredFields();
-        for (Field field: fields){
+        for (Field field : fields) {
             if (field.isAnnotationPresent(ValueFrom.class)) {
                 var value = field.getAnnotation(ValueFrom.class).value();
                 localSettings.put(
@@ -69,13 +88,13 @@ public class BeanDefinitionFactory {
                 .filter(any -> !any.isSynthetic())
                 .findFirst()
                 .orElseThrow(() ->
-                        new AbsentConstructorException(String.format(
-                                MISSING_CONSTRUCTOR_ERROR_TEMPLATE,
-                                sourceClass.getName()
-                        ))
+                                     new AbsentConstructorException(String.format(
+                                             MISSING_CONSTRUCTOR_ERROR_TEMPLATE,
+                                             sourceClass.getName()
+                                     ))
                 );
         Parameter[] parameters = constructor.getParameters();
-        for (Parameter parameter: parameters){
+        for (Parameter parameter : parameters) {
             if (parameter.isAnnotationPresent(ValueFrom.class)) {
                 var value = parameter.getAnnotation(ValueFrom.class).value();
                 localSettings.put(
@@ -87,7 +106,7 @@ public class BeanDefinitionFactory {
 
         return new ClassSettings(
                 sourceClass,
-                localSettings.isEmpty() ?  null : localSettings
+                localSettings.isEmpty() ? null : localSettings
         );
     }
 

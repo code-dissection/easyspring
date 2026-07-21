@@ -46,4 +46,19 @@ public class MessageTemplate {
             Solution: Provide constructor for type.
                                 
             """;
+
+    public static final String SCOPED_TARGET_PROBLEM_ERROR_TEMPLATE = """
+            
+                                
+            [EasySpring BeanDefinition configuration failure]: Scoped target problem detected
+            │
+            ├──> Singleton scope type:
+            │      └──> %s
+            │      
+            └──> OneOff scope dependency:
+                  └──> %s
+                                
+            Solution: We recommend to use provider pattern to inject OneOff bean in singleton.
+                                
+            """;
 }

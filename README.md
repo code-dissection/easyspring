@@ -33,6 +33,7 @@
 <div style="font-size: 18px;  line-height: 1.6; font-family: monospace; margin-top: 20px;">
 Контекст поднимается за счет строго последовательного 6-ти фазного пайплайна, оркестрируемого <br/>
 загрузчиком <code>Bootstrapper</code>
+
 </div>
 <div style="font-size: 18px;  line-height: 1.6; font-family: monospace; margin-top: 20px;">
     [1] Сканирование файла конфигураций <br>
@@ -40,7 +41,7 @@
     [2] Сканирование клиентского проекта <br>
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<code>ProjectScanner</code> ──> Scan package & generate Metadata<br/>
     [3] Топологическая сортировка метафинформации клиентского проекта и контроль наличия<br/>
-        &nbsp;&nbsp;&nbsp;&nbsp;циклических зависимостей<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;циклических зависимостей<br>
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<code>TopologySorter</code> ──> Build Graph & sort dependencies<br/>
     [4] Создание упорядоченного списка биндефинишенов. Валидация скоупа будущих бинов.<br/>
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<code>DefinitionFactory</code> ──> Create BeanDefinitions & Validate Scopes<br/>
@@ -80,6 +81,22 @@
       └──> com.example.app.services.ClassB
                     
 Solution: We recommend to use provider pattern to inject OneOff bean in singleton.
+```
+
+<div style="font-size: 18px;  line-height: 1.6; font-family: monospace; margin-top: 20px;">
+Пример:<br/>
+Если разработчик пишит на Spring'е, как правило, в случае ошибки ему приходится дебажить код, поднимать и запускать проект,<br/>
+лаколизовать ошибку, работать с полотнами стектрейса. EasySpring выдает очень точные, сообщения об ошибках в псевдографике. <br/>
+Дебажить код не требуется.
+</div>
+
+```text
+[EasySpring Topology sorter failure]: Circular dependency detected
+│
+└──> Circular chain of dependencies:
+      └──> root2.ClassC ──> root2.ClassA ──> root2.ClassB ──> root2.ClassC
+
+Solution: Resolve this architecture failure.
 ```
 
 <h2 style="font-size: 34px; margin-top: 40px;">🔧 Аннотации</h2>

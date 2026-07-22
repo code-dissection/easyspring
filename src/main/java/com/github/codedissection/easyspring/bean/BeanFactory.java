@@ -3,6 +3,7 @@ package com.github.codedissection.easyspring.bean;
 import com.github.codedissection.easyspring.bean.annotation.Init;
 import com.github.codedissection.easyspring.bean.exception.BeanCreateException;
 import com.github.codedissection.easyspring.bean.exception.message.MessageTemplate;
+import com.github.codedissection.easyspring.context.ProjectContext;
 import com.github.codedissection.easyspring.definition.annotation.ValueFrom;
 import com.github.codedissection.easyspring.definition.enums.BeanReuseStrategy;
 import com.github.codedissection.easyspring.definition.model.BeanDefinition;
@@ -29,15 +30,16 @@ import static com.github.codedissection.easyspring.bean.exception.message.Messag
 
 public class BeanFactory {
 
-    public Map<Class<?>, Object> createBeanMap(LinkedHashMap<Class<?>, BeanDefinition> definitionMap) {
+    public Map<Class<?>, Object> createBeanMap(LinkedHashMap<Class<?>, BeanDefinition> definitionMap, ProjectContext projectContext) {
         var beanStorage = new BeanStorageMap();
+        beanStorage.saveContext(projectContext);
         for (Map.Entry<Class<?>, BeanDefinition> definitionPair : definitionMap.entrySet()) {
             var definition = definitionPair.getValue();
             if (definition.beanReuseStrategy() == BeanReuseStrategy.ONEOFF)
                 continue;
             List<Class<?>> dependencies = definition.dependencies();
-            List<Object> beans = beanStorage.getResolvedDependencyToObjectList(dependencies);
-            var bean = createBean(definition, beans);
+            List<Object> beansForImport = beanStorage.getResolvedDependencyToObjectList(dependencies);
+            var bean = createBean(definition, beansForImport);
             beanStorage.saveBean(definition.sourceClass(), bean);
         }
         return Collections.unmodifiableMap(beanStorage.getBeanMap());
@@ -178,6 +180,10 @@ public class BeanFactory {
 
     static class BeanStorageMap {
         Map<Class<?>, Object> beanStorage = new HashMap<>();
+
+        private void saveContext(ProjectContext projectContext) {
+            beanStorage.put(ProjectContext.class, projectContext);
+        }
 
         private void saveBean(Class<?> key, Object bean) {
             beanStorage.put(key, bean);

@@ -34,6 +34,7 @@ public class ProjectContext {
 
     public ProjectContext() {
         Runtime.getRuntime().addShutdownHook(new Thread(this::close));
+        beanStorage.saveBean(ProjectContext.class, this);
     }
 
     public void saveDefinitions(LinkedHashMap<Class<?>, BeanDefinition> definitions) {

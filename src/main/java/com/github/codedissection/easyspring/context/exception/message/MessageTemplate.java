@@ -65,4 +65,16 @@ public class MessageTemplate {
                                 
             """;
 
+    public static final String PROJECT_SHUTDOWN_TEMPLATE = """
+            
+                                            
+            [EasySpring Project is shutting down]: Project is shutting down
+            │
+            └──> Unavailable bean:
+                  └──> %s 
+                                
+            Solution: Just relax.
+                                
+            """;
+
 }

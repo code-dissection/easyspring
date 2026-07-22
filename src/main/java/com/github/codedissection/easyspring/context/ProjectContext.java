@@ -21,6 +21,7 @@ import java.util.stream.Collectors;
 import static com.github.codedissection.easyspring.context.exception.message.MessageTemplate.CLOSE_METHOD_ACCESS_ERROR_TEMPLATE;
 import static com.github.codedissection.easyspring.context.exception.message.MessageTemplate.INVOCATION_METHOD_ACCESS_ERROR_TEMPLATE;
 import static com.github.codedissection.easyspring.context.exception.message.MessageTemplate.MULTIPLE_CLOSE_METHODS_ERROR_TEMPLATE;
+import static com.github.codedissection.easyspring.context.exception.message.MessageTemplate.PROJECT_SHUTDOWN_TEMPLATE;
 import static com.github.codedissection.easyspring.context.exception.message.MessageTemplate.STATIC_CLOSE_METHOD_ERROR_TEMPLATE;
 
 public class ProjectContext {
@@ -45,7 +46,10 @@ public class ProjectContext {
 
     public <T> T getBean(Class<T> clazz) {
         if(isClosed.get())
-            throw new IllegalStateException("Context is closed. Can't return bean while shutdown.");
+            throw new ShutdownProjectException(String.format(
+                    PROJECT_SHUTDOWN_TEMPLATE,
+                    clazz.getName()
+            ));
         var bean = beanStorage.getBean(clazz);
         if (bean != null)
             return (T) bean;

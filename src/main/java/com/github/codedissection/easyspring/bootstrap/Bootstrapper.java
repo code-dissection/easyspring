@@ -32,6 +32,4 @@ public final class Bootstrapper {
 
         return projectContext;
     }
-
-
 }

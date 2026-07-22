@@ -10,6 +10,7 @@ import com.github.codedissection.easyspring.topologysorter.MetadataTopologySorte
 public final class Bootstrapper {
 
     public ProjectContext process(String packageToScan) {
+        var projectContext = new ProjectContext();
 
         var settingsScanner = new SettingsFileScanner();
         var settings = settingsScanner.getSettings();
@@ -24,9 +25,8 @@ public final class Bootstrapper {
         var definitionMap = definitionFactory.createSortedBeanDefinitionMap(sortedMetadata, settings);
 
         var beanFactory = new BeanFactory();
-        var beans = beanFactory.createBeanMap(definitionMap);
+        var beans = beanFactory.createBeanMap(definitionMap, projectContext);
 
-        var projectContext = new ProjectContext();
         projectContext.saveDefinitions(definitionMap);
         projectContext.saveBeans(beans);
 

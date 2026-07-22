@@ -14,6 +14,10 @@ public class BeanStorage {
         );
     }
 
+    public void saveBean(Class<?> key, Object bean) {
+        beanStorage.put(key, bean);
+    }
+
     public Object getBean(Class<?> clazz) {
         return beanStorage.get(clazz);
     }

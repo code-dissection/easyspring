@@ -1,5 +1,6 @@
 package com.github.codedissection.easyspring.definition;
 
+import com.github.codedissection.easyspring.context.ProjectContext;
 import com.github.codedissection.easyspring.definition.annotation.ValueFrom;
 import com.github.codedissection.easyspring.definition.enums.BeanReuseStrategy;
 import com.github.codedissection.easyspring.definition.exception.AbsentConstructorException;
@@ -103,7 +104,6 @@ public class BeanDefinitionFactory {
                 );
             }
         }
-
         return new ClassSettings(
                 sourceClass,
                 localSettings.isEmpty() ? null : localSettings
@@ -136,6 +136,7 @@ public class BeanDefinitionFactory {
                 flattenHierarchy.put(ancestor, child);
             }
         }
+        flattenHierarchy.put(ProjectContext.class, ProjectContext.class);
         return flattenHierarchy;
     }
 

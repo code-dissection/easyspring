@@ -85,8 +85,8 @@ Solution: We recommend to use provider pattern to inject OneOff bean in singleto
 
 <div style="font-size: 18px;  line-height: 1.6; font-family: monospace; margin-top: 20px;">
 Пример:<br/>
-Если разработчик пишит на Spring'е, как правило, в случае ошибки ему приходится дебажить код, поднимать и запускать проект,<br/>
-лаколизовать ошибку, работать с полотнами стектрейса. EasySpring выдает очень точные, сообщения об ошибках в псевдографике. <br/>
+Если разработчик пишит на Spring'е, как правило, в случае ошибки ему приходится дебажить код, поднимать и запускать проект, 
+лаколизовать ошибку, работать с полотнами стектрейса. EasySpring выдает очень точные, сообщения об ошибках в псевдографике. 
 Дебажить код не требуется.
 </div>
 
@@ -94,7 +94,7 @@ Solution: We recommend to use provider pattern to inject OneOff bean in singleto
 [EasySpring Topology sorter failure]: Circular dependency detected
 │
 └──> Circular chain of dependencies:
-      └──> root2.ClassC ──> root2.ClassA ──> root2.ClassB ──> root2.ClassC
+      └──> com.app.services.ClassC ──> com.app.services.ClassA ──> com.app.services.ClassB ──> com.app.services.ClassC
 
 Solution: Resolve this architecture failure.
 ```

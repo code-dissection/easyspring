@@ -31,21 +31,23 @@
 <h2 style="font-size: 34px; margin-top: 40px;">🛠️ Архитектура</h2>
 
 <div style="font-size: 18px;  line-height: 1.6; font-family: monospace; margin-top: 20px;">
-Контекст поднимается за счет строго последовательного 6-ти фазного пайплайна, оркестрируемого загрузчиком <code>Bootstrapper</code>
+Контекст поднимается за счет строго последовательного 6-ти фазного пайплайна, оркестрируемого <br/>
+загрузчиком <code>Bootstrapper</code>
 </div>
 <div style="font-size: 18px;  line-height: 1.6; font-family: monospace; margin-top: 20px;">
     [1] Сканирование файла конфигураций <br>
-        &nbsp;&nbsp;&nbsp;&nbsp;<code>SettingsFileScanner</code> ──> Read AppSettings.yml / AppSettings.yaml<br/>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<code>SettingsFileScanner</code> ──> Read AppSettings.yml / AppSettings.yaml<br/>
     [2] Сканирование клиентского проекта <br>
-        &nbsp;&nbsp;&nbsp;&nbsp;<code>ProjectScanner</code> ──> Scan package & generate Metadata<br/>
-    [3] Топологическая сортировка метафинформации клиентского проекта и контроль наличия циклических зависимостей<br>
-        &nbsp;&nbsp;&nbsp;&nbsp;<code>TopologySorter</code> ──> Build Graph & sort dependencies<br/>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<code>ProjectScanner</code> ──> Scan package & generate Metadata<br/>
+    [3] Топологическая сортировка метафинформации клиентского проекта и контроль наличия<br/>
+        &nbsp;&nbsp;&nbsp;&nbsp;циклических зависимостей<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<code>TopologySorter</code> ──> Build Graph & sort dependencies<br/>
     [4] Создание упорядоченного списка биндефинишенов. Валидация скоупа будущих бинов.<br/>
-        &nbsp;&nbsp;&nbsp;&nbsp;<code>DefinitionFactory</code> ──> Create BeanDefinitions & Validate Scopes<br/>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<code>DefinitionFactory</code> ──> Create BeanDefinitions & Validate Scopes<br/>
     [5] Создание бинов и валидация<br/>
-        &nbsp;&nbsp;&nbsp;&nbsp;<code>BeanFactory</code> ──> Instantiate Beans & Inject Dependencies<br/>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<code>BeanFactory</code> ──> Instantiate Beans & Inject Dependencies<br/>
     [6] Сборка контекста<br/>
-        &nbsp;&nbsp;&nbsp;&nbsp;<code>ProjectContext</code> ──> Assemble Context & Ready for use
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<code>ProjectContext</code> ──> Assemble Context & Ready for use
 </div>
 
 <h2 style="font-size: 34px; margin-top: 40px;">⚙️ Требования</h2>
@@ -72,7 +74,7 @@
 [EasySpring BeanDefinition configuration failure]: Scoped target problem detected
 │
 ├──> Singleton scope type:
-│      └──> com.example.app.services.ClassA
+│     └──> com.example.app.services.ClassA
 │      
 └──> OneOff scope dependency:
       └──> com.example.app.services.ClassB
@@ -80,8 +82,14 @@
 Solution: We recommend to use provider pattern to inject OneOff bean in singleton.
 ```
 
-
-
+<h2 style="font-size: 34px; margin-top: 40px;">🔧 Аннотации</h2>
+<div style="font-size: 18px;  line-height: 1.6; font-family: monospace; margin-top: 20px;">
+@Managed - аналог @Component<br/>
+@OneOff - аналог @Prototype<br/>
+@ValueFrom - аналог @Value<br/>
+@Init - аналог @PostConstruct<br/>
+@Close - аналог @PreDestroy<br/>
+</div>
 
 <h2 style="font-size: 34px; margin-top: 40px;">🚀 Пример старта</h2>
 <div style="font-size: 18px;  line-height: 1.6; font-family: monospace; margin-top: 20px;">

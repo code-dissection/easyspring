@@ -106,8 +106,7 @@ Solution: Resolve this architecture failure.
 @ValueFrom - аналог @Value<br/>
 @Init - аналог @PostConstruct<br/>
 @Close - аналог @PreDestroy<br/>
-
-
+<br>
 Аннотация @ValueFrom используется без маркеров парсера ${}.<br/>
 Пример: @ValueFrom("app.app2.app3") String appParameter
 </div>

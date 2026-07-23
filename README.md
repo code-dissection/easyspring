@@ -107,13 +107,14 @@ Solution: Resolve this architecture failure.
 @Init - аналог @PostConstruct<br/>
 @Close - аналог @PreDestroy<br/>
 
+
 Аннотация @ValueFrom используется без маркеров парсера ${}.<br/>
 Пример: @ValueFrom("app.app2.app3") String appParameter
 </div>
 
 <h2 style="font-size: 34px; margin-top: 40px;">🚀 Пример старта</h2>
 <div style="font-size: 18px;  line-height: 1.6; font-family: monospace; margin-top: 20px;">
-Фреймворк поддерживает аннатационную конфигурацию и НЕ поддеживает XML и Java конфигурации.
+Фреймворк поддерживает аннатационную конфигурацию и НЕ поддерживает XML и Java конфигурации.
 В остальном он очень похож на классический Spring.
 </div>
 

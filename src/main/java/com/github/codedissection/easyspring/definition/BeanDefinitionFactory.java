@@ -21,6 +21,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static com.github.codedissection.easyspring.definition.exception.message.MessageTemplate.MISSING_CONSTRUCTOR_ERROR_TEMPLATE;
 import static com.github.codedissection.easyspring.definition.exception.message.MessageTemplate.MULTIPLE_IMPLEMENTATIONS_ERROR_TEMPLATE;
@@ -32,9 +33,13 @@ public class BeanDefinitionFactory {
     public LinkedHashMap<Class<?>, BeanDefinition> createSortedBeanDefinitionMap(List<TypeMetadata> containers, Map<String, Object> settings) {
         var definitionMap = new LinkedHashMap<Class<?>, BeanDefinition>();
         var resolvedTypes = getResolvedTypes(containers);
+        var onlyProjectTypes = containers.stream()
+                .map(container -> container.sourceClass().getComponentType())
+                .collect(Collectors.toSet());
         for (TypeMetadata container : containers) {
             var sourceClass = container.sourceClass();
             var dependencies = container.dependencies().stream()
+                    .filter(onlyProjectTypes::contains)
                     .<Class<?>>map(rawType -> {
                         var resolvedType = resolvedTypes.get(rawType);
                         if (resolvedType == null)

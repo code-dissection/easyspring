@@ -67,7 +67,7 @@ public class ProjectContext {
         return (T) bean;
     }
 
-    private void close() {
+    public void close() {
         if (!isClosed.compareAndSet(false, true))
             return;
         var toDieOrder = new ArrayList<>(definitionStorage.getBeanDefinitions().keySet());

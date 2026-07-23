@@ -9,15 +9,15 @@ import java.util.Map;
 import static com.github.codedissection.easyspring.settingscanner.exception.message.MessageTemplate.PARSING_YAML_ERROR_TEMPLATE;
 
 public class SettingsFileScanner {
-    private final String APPLICATION_CONFIG_FILE = "AppConfig.yml";
-    private final String APPLICATION_CONFIG_YAML_FILE = "AppConfig.yaml";
+    private final String APPLICATION_SETTINGS_FILE = "AppSettings.yml";
+    private final String APPLICATION_SETTINGS_YAML_FILE = "AppSettings.yaml";
 
 
     public Map<String, Object> getSettings() {
         var loader = getClass().getClassLoader();
-        var url = loader.getResource(APPLICATION_CONFIG_FILE);
+        var url = loader.getResource(APPLICATION_SETTINGS_FILE);
         if (url == null)
-            url = loader.getResource(APPLICATION_CONFIG_YAML_FILE);
+            url = loader.getResource(APPLICATION_SETTINGS_YAML_FILE);
         if (url == null) {
             return Map.of();
         }
